@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Project extends Model
+{
+    public function file1()
+    {
+        return $this->belongsTo(File::class, 'file1_id');
+    }
+
+    public function file2()
+    {
+        return $this->belongsTo(File::class, 'file2_id');
+    }
+}
+
