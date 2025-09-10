@@ -98,6 +98,7 @@
             overflow-y: auto;
             margin-top: 1rem;
         }
+
         .hero-bg {
             background: linear-gradient(135deg, #6e8efb, #a777e3);
         }
@@ -120,10 +121,12 @@
 
     <!-- Trees Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div id="tree1" class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft">
+        <div id="tree1"
+            class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft">
             <h3 class="font-bold text-indigo-900 mb-2">Tree 1</h3>
         </div>
-        <div id="tree2" class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight">
+        <div id="tree2"
+            class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight">
             <h3 class="font-bold text-indigo-900 mb-2">Tree 2</h3>
         </div>
     </div>
@@ -134,44 +137,59 @@
     </div>
 
     <!-- Suggestions Section -->
-    <div class="flex flex-col items-center gap-4 mb-8">
-        <button id="generateSuggestionsBtn"
-            class="px-6 py-2 bg-green-800 text-white font-semibold rounded-full shadow-lg hover:bg-green-600 transition transform hover:scale-105 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2">
+    <div class="flex flex-col items-center gap-6 mb-8 max-w-3xl mx-auto">
+
+        <!-- Generate Suggestions Button -->
+        <button id="generateSuggestionsBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full 
+               bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow-lg
+               hover:from-green-600 hover:to-green-800 transform transition-all duration-300 hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             Find Suggestions
         </button>
 
-        <div id="suggestionsStatus" class="w-2/3">
+        <!-- Progress Bar -->
+        <div id="suggestionsStatus" class="w-full bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-inner">
             <div class="w-full bg-gray-300 rounded-full h-4 overflow-hidden shadow-inner">
-                <div id="suggestionsProgress" class="bg-green-400 h-4 w-0 transition-all duration-500 rounded-full"></div>
+                <div id="suggestionsProgress" class="bg-green-400 h-4 w-0 transition-all duration-500 rounded-full">
+                </div>
             </div>
-            <div class="text-center mt-1">
-                <span id="suggestionsCount" class="text-sm text-gray-100 font-semibold"></span>
+            <div class="text-center mt-2">
+                <span id="suggestionsCount" class="text-sm text-gray-900 font-semibold"></span>
             </div>
         </div>
     </div>
 
-    <div id="node-suggestions" class="hidden bg-white rounded-xl shadow-lg p-6 max-w-3xl mx-auto animate__animated animate__fadeInUp">
-        <h3 class="text-lg font-semibold mb-3 text-indigo-900 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <!-- Suggestions List -->
+    <div id="node-suggestions"
+        class="hidden bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6 max-w-3xl mx-auto animate__animated animate__fadeInUp">
+
+        <h3 class="text-xl font-bold mb-4 text-indigo-900 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
             </svg>
             Suggestions
         </h3>
-        <div id="suggestions-list" class="text-gray-700 text-sm space-y-1"></div>
+
+        <div id="suggestions-list" class="text-gray-700 text-sm space-y-2"></div>
     </div>
 
-    <!-- Create Link Section -->
-    <div class="link-section bg-white rounded-xl shadow-lg p-6 max-w-3xl mx-auto my-6 animate__animated animate__fadeInUp">
-        <h3 class="text-lg font-semibold mb-4 text-indigo-900">Create Link</h3>
 
-        <div class="flex flex-col md:flex-row md:gap-4 gap-2">
+    <!-- Create Link Section -->
+    <div
+        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto my-6 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
+
+        <h3 class="text-2xl font-bold text-indigo-900 mb-6 text-center">Create Link</h3>
+
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <!-- Category -->
             <div class="flex-1 flex flex-col">
                 <label for="linkCategory" class="text-sm font-medium mb-1">Category</label>
-                <select id="linkCategory" class="p-2 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                <select id="linkCategory"
+                    class="p-3 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-gray-700">
                     <option value="">-- Select Category --</option>
                     <option value="SKOS">SKOS</option>
                     <option value="OWL">OWL</option>
@@ -179,33 +197,64 @@
                 </select>
             </div>
 
+            <!-- Type -->
             <div class="flex-1 flex flex-col">
                 <label for="linkTypeSelect" class="text-sm font-medium mb-1">Type</label>
-                <select id="linkTypeSelect" class="p-2 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                <select id="linkTypeSelect"
+                    class="p-3 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-gray-700">
                     <option value="">-- Select Type --</option>
                 </select>
             </div>
         </div>
 
-        <button id="createLinkBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition transform hover:scale-105 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
-            </svg>
-            Link Selected Suggestion
-        </button>
+        <!-- Create Link Button -->
+        <div class="flex justify-center">
+            <button id="createLinkBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
+                   bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg 
+                   hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
+                </svg>
+                Link Selected Suggestion
+            </button>
+        </div>
     </div>
 
-    <!-- Export Links Button -->
-    <div class="flex justify-end max-w-3xl mx-auto mb-6">
-        <button id="exportLinksBtn" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2 transition transform hover:scale-105 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
-            </svg>
-            Export Links
-        </button>
+    <!-- Export Section -->
+    <div class="flex justify-center mt-10">
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-xl text-center 
+              transform transition duration-500 hover:scale-[1.02]">
+
+            <h3 class="text-2xl font-bold text-indigo-900 mb-6">Export Options</h3>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+
+                <!-- Export Links -->
+                <button id="exportLinksBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
+               bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg 
+               hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
+                    </svg>
+                    Export Links
+                </button>
+
+                <!-- Export Ontology -->
+                <button onclick="downloadOntology(projectId)" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
+               bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg 
+               hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Export Ontology
+                </button>
+
+            </div>
+        </div>
     </div>
 
     <script>
@@ -236,6 +285,30 @@
                 console.error(err);
                 alert("Error loading project files: " + err.message);
             }
+        }
+
+        function downloadOntology(projectId) {
+            const url = `http://127.0.0.1:8000/projects/${projectId}/export`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("No ontology available for this project");
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `project_${projectId}_ontology.ttl`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(err => {
+                    alert(err.message);
+                    console.error(err);
+                });
         }
 
         async function showNodeInfo(nodeData) {

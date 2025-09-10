@@ -135,7 +135,7 @@
                 const data = await response.json();
                 if (response.ok) {
                     alert('Project created successfully!');
-                    window.location.href = './project';
+                    window.location.href = './dashboard';
                 } else {
                     alert('Failed to create project: ' + JSON.stringify(data.detail));
                 }
