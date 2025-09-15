@@ -98,8 +98,26 @@
                 </a>
             </div>
 
-        </div>
+            <!-- Direct Tree -->
+            <div
+                class="bg-gradient-to-br from-purple-50 to-purple-200 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="p-4 bg-white-800 text-white rounded-2xl shadow-inner">
+                        <div class="p-4 bg-white-500 text-white rounded-2xl shadow-inner">
+                            <img src="./img/sematic.png" alt="Tree Icon" class="w-12 h-12">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-purple-800">Direct Tree</h3>
+                </div>
 
+                <p class="text-purple-700 mb-4">Visualize ontologies in an interactive force-directed graph.</p>
+
+                <button disabled
+                    class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-300 text-purple-600 cursor-not-allowed shadow-inner">
+                    Coming Soon
+                </button>
+            </div>
+        </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-lg">
             <h3 class="font-semibold text-xl text-gray-800 mb-6 text-center">Your Uploaded RDF Files</h3>
@@ -369,6 +387,10 @@
 
     </script>
 
+    <!-- Footer -->
+    <footer class="mt-auto mb-4 text-pink-500 text-sm animate__animated animate__fadeInUp text-center">
+        &copy; 2025 AlignMe. All rights reserved.
+    </footer>
 </body>
 
 </html>

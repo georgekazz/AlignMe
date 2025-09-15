@@ -39,3 +39,7 @@ Route::get('/project/{id}', function ($id) {
 Route::get('/vote', function() {
     return view('vote');
 });
+
+Route::get('/force-tree', function() {
+    return view('forcedirectedtree');
+});
