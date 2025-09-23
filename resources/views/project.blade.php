@@ -38,6 +38,7 @@
 
         .node-card:hover {
             background: #e0f2fe;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         .node-card.selected {
@@ -46,9 +47,9 @@
         }
 
         .node-children {
-            margin-left: 1rem;
-            border-left: 1px dashed #ddd;
-            padding-left: 0.5rem;
+             margin-left: 1.5rem;
+            border-left: 2px solid #cbd5e1; /* πιο έντονο και ορατό */
+            padding-left: 0.75rem;
         }
 
         .arrow {
@@ -56,7 +57,7 @@
             height: 1rem;
             margin-right: 0.25rem;
             color: #6b7280;
-            transition: transform 0.2s;
+           transition: transform 0.2s ease;
         }
 
         .arrow-collapsed {
@@ -99,8 +100,21 @@
             margin-top: 1rem;
         }
 
+        .node-children .arrow {
+            color: #9ca3af; /* πιο απαλό για υπο-επίπεδα */
+        }
+        
         .hero-bg {
             background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+
+        .node-children .node-card {
+            background: #f3f4f6; /* πιο ανοιχτό γκρι για παιδιά */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .node-children .node-children .node-card {
+            background: #e5e7eb; /* ακόμα πιο ανοιχτό για επόμενα επίπεδα */
         }
     </style>
 </head>
@@ -122,14 +136,22 @@
     <!-- Trees Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div id="tree1"
-            class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft">
-            <h3 class="font-bold text-indigo-900 mb-2">Tree 1</h3>
+            class="bg-white rounded-2xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft border border-gray-200">
+            <h3 class="font-bold text-indigo-900 text-lg mb-3 border-b border-gray-100 pb-2">Source</h3>
+            <div class="tree-container mt-2">
+                <!-- Nodes θα γεμίσουν με JS -->
+            </div>
         </div>
+
         <div id="tree2"
-            class="bg-white rounded-xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight">
-            <h3 class="font-bold text-indigo-900 mb-2">Tree 2</h3>
+            class="bg-white rounded-2xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight border border-gray-200">
+            <h3 class="font-bold text-indigo-900 text-lg mb-3 border-b border-gray-100 pb-2">Target</h3>
+            <div class="tree-container mt-2">
+                <!-- Nodes θα γεμίσουν με JS -->
+            </div>
         </div>
     </div>
+
 
     <div id="node-info" class="hidden bg-white p-4 rounded shadow max-w-s max-h-64 overflow-y-auto">
         <h2 id="node-title" class="text-lg font-semibold mb-2"></h2>

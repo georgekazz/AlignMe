@@ -104,10 +104,9 @@
                 <div class="flex items-center space-x-4 mb-4">
                     <div class="p-4 bg-white-800 text-white rounded-2xl shadow-inner">
                         <div class="p-4 bg-white-500 text-white rounded-2xl shadow-inner">
-                            <img src="./img/sematic.png" alt="Tree Icon" class="w-12 h-12">
+                            <p class="text-xl font-bold text-purple-800">Direct Tree</p>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-purple-800">Direct Tree</h3>
                 </div>
 
                 <p class="text-purple-700 mb-4">Visualize ontologies in an interactive force-directed graph.</p>
@@ -140,6 +139,9 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="flex justify-center mt-4 space-x-2"></div>
         </div>
 
         <!-- Πίνακας Projects -->
@@ -220,6 +222,10 @@
             window.location.href = './login';
         });
 
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let allFiles = [];
+
         async function loadUserFiles() {
             try {
                 const response = await fetch('http://127.0.0.1:8000/my-files/', {
@@ -230,62 +236,92 @@
 
                 if (!response.ok) throw new Error('Failed to fetch files');
 
-                const files = await response.json();
-                const tbody = document.getElementById('filesTableBody');
-                tbody.innerHTML = '';
-
-                files.forEach(file => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                <td class="border px-4 py-2 text-center">${file.id}</td>
-                <td class="border px-4 py-2 text-center">${file.filename}</td>
-                <td class="border px-4 py-2 text-center">${file.filetype}</td>
-                <td class="border px-4 py-2 text-center">${file.status}</td>
-                <td class="border px-4 py-2 text-center">
-                ${file.public
-                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>`
-                            : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>`}
-                </td>
-                <td class="border px-4 py-2 text-center">${new Date(file.created_at).toLocaleString()}</td>
-                <td class="border px-4 py-2 text-center">
-                <button class="px-3 py-1 rounded font-bold text-white ${file.parsed ? 'bg-green-500' : 'bg-red-500'}">
-                    ${file.parsed ? 'Parsed' : 'Parse'}
-                </button>
-            </td>
-            `;
-                    const button = tr.querySelector('button');
-                    button.addEventListener('click', async () => {
-                        try {
-                            const parseResp = await fetch(`http://127.0.0.1:8000/files/${file.id}/parse`, {
-                                method: 'POST',
-                                headers: { 'Authorization': 'Bearer ' + token }
-                            });
-                            if (!parseResp.ok) throw new Error('Parsing failed');
-
-                            button.classList.remove('bg-red-500');
-                            button.classList.add('bg-green-500');
-                            button.textContent = 'Parsed';
-
-                            tr.children[3].textContent = 'parsed';
-                            file.parsed = true;
-                        } catch (err) {
-                            alert('Parsing failed: ' + err.message);
-                        }
-                    });
-
-                    tbody.appendChild(tr);
-
-                });
+                allFiles = await response.json();
+                displayFiles(currentPage);
+                setupPagination();
             } catch (err) {
                 console.error(err);
                 alert('Error loading files');
             }
         }
+
+        function displayFiles(page) {
+            const tbody = document.getElementById('filesTableBody');
+            tbody.innerHTML = '';
+
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const files = allFiles.slice(start, end);
+
+            files.forEach(file => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="border px-4 py-2 text-center">${file.id}</td>
+                    <td class="border px-4 py-2 text-center">${file.filename}</td>
+                    <td class="border px-4 py-2 text-center">${file.filetype}</td>
+                    <td class="border px-4 py-2 text-center">${file.status}</td>
+                    <td class="border px-4 py-2 text-center">
+                        ${file.public
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>`
+                            : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>`}
+                    </td>
+                    <td class="border px-4 py-2 text-center">${new Date(file.created_at).toLocaleString()}</td>
+                    <td class="border px-4 py-2 text-center">
+                        <button class="px-3 py-1 rounded font-bold text-white ${file.parsed ? 'bg-green-500' : 'bg-red-500'}">
+                            ${file.parsed ? 'Parsed' : 'Parse'}
+                        </button>
+                    </td>
+                `;
+                const button = tr.querySelector('button');
+                button.addEventListener('click', async () => {
+                    try {
+                        const parseResp = await fetch(`http://127.0.0.1:8000/files/${file.id}/parse`, {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (!parseResp.ok) throw new Error('Parsing failed');
+
+                        button.classList.remove('bg-red-500');
+                        button.classList.add('bg-green-500');
+                        button.textContent = 'Parsed';
+                        file.parsed = true;
+                    } catch (err) {
+                        alert('Parsing failed: ' + err.message);
+                    }
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setupPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const totalPages = Math.ceil(allFiles.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = `px-3 py-1 border rounded ${i === currentPage ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'}`;
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    displayFiles(i);
+                    setupPagination();
+                });
+                pagination.appendChild(btn);
+            }
+        }
+
+        // Σιγουρέψου ότι υπάρχει div για τα κουμπιά pagination
+        // <div id="pagination" class="flex justify-center mt-4 space-x-2"></div>
+
         loadUserFiles();
+
 
         async function loadUserProjects() {
             try {

@@ -51,7 +51,7 @@
 
         async function loadLinks() {
             try {
-                const res = await fetch("http://127.0.0.1:8000/links", {
+                const res = await fetch("http://127.0.0.1:8000/links-vote", {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const data = await res.json();
@@ -66,7 +66,9 @@
                     row.innerHTML = `
             <td class="px-6 py-4 text-gray-800 font-medium">${link.source_node}</td>
             <td class="px-6 py-4 text-gray-800">${link.target_node}</td>
-            <td class="px-6 py-4 text-gray-600 italic">${link.link_type_text || link.link_type_id}</td>
+            <td class="px-6 py-4 text-gray-600 italic">
+                ${link.link_type?.inner || link.link_type_id}
+            </td>
             <td class="px-6 py-4 text-center font-bold text-indigo-700">${link.suggestion_score}</td>
             <td class="px-6 py-4 text-center">
               <div class="flex flex-col items-center gap-2">
