@@ -105,7 +105,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error loading files');
+                showNotification('Error loading files: ' + err.message, 'error');
             }
         }
 
@@ -118,7 +118,7 @@
             const file2_id = document.getElementById('file2').value;
 
             if (file1_id === file2_id) {
-                alert("Please select two different files!");
+                showNotification('Please select two different files!', 'error');
                 return;
             }
 
@@ -195,6 +195,38 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
+
+
+        function showNotification(message, type = 'success') {
+            const panel = document.getElementById('notificationPanel');
+            panel.textContent = message;
+
+            panel.className = "fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center z-50";
+
+            if (type === 'success') {
+                panel.classList.add("bg-green-500");
+            } else if (type === 'error') {
+                panel.classList.add("bg-red-500");
+            } else if (type === 'warning') {
+                panel.classList.add("bg-yellow-500");
+            } else {
+                panel.classList.add("bg-gray-700");
+            }
+
+            panel.classList.remove("hidden");
+
+            setTimeout(() => {
+                panel.classList.add("hidden");
+            }, 5000);
+        }
+
+    </script>
+
+    <div 
+        id="notificationPanel" 
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center hidden z-50">
+    </div>
+
     </script>
 
 </body>

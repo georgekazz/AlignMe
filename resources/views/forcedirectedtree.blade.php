@@ -136,7 +136,7 @@
                 const res = await fetch(`http://127.0.0.1:8000/files/${fileId}/convert`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { const err = await safeJson(res); alert('Conversion failed: ' + (err.detail || err.message || res.statusText)); return false; }
                 const data = await res.json();
-                alert('Conversion succeeded');
+                showNotification('Conversion succeeded!', 'success');
                 markParsed(fileId);
                 return true;
             } catch (e) { console.error(e); alert('Conversion error: ' + e.message); return false; }
@@ -282,8 +282,36 @@
         }
 
         loadUserFiles();
-    </script>
 
+        function showNotification(message, type = 'success') {
+            const panel = document.getElementById('notificationPanel');
+            panel.textContent = message;
+
+            panel.className = "fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center z-50";
+
+            if (type === 'success') {
+                panel.classList.add("bg-green-500");
+            } else if (type === 'error') {
+                panel.classList.add("bg-red-500");
+            } else if (type === 'warning') {
+                panel.classList.add("bg-yellow-500");
+            } else {
+                panel.classList.add("bg-gray-700");
+            }
+
+            panel.classList.remove("hidden");
+
+            setTimeout(() => {
+                panel.classList.add("hidden");
+            }, 5000);
+        }
+    </script>
+    
+    <div 
+        id="notificationPanel" 
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center hidden z-50">
+    </div>
+    
     <footer class="mt-12 text-indigo-100 text-sm text-center">
         &copy; 2025 AlignMe. All rights reserved.
     </footer>

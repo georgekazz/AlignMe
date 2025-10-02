@@ -242,6 +242,8 @@
             } catch (err) {
                 console.error(err);
                 alert('Error loading files');
+                showNotification('Error loading files', 'error');
+
             }
         }
 
@@ -290,7 +292,7 @@
                         button.textContent = 'Parsed';
                         file.parsed = true;
                     } catch (err) {
-                        alert('Parsing failed: ' + err.message);
+                        showNotification('Parsing failed: ' + err.message, 'error');
                     }
                 });
 
@@ -354,7 +356,7 @@
                 });
             } catch (err) {
                 console.error(err);
-                alert('Error loading projects');
+                showNotification('Error loading projects', 'error');
             }
         }
 
@@ -411,18 +413,46 @@
                     alert(data.message);
                     loadUserLinks();
                 } else {
-                    alert("Error deleting link");
+
+                    showNotification('Error deleting link', 'error');
                 }
             } catch (err) {
                 console.error(err);
-                alert("Failed to delete link");
+                showNotification('Failed to delete link', 'error');
             }
         }
 
         document.addEventListener("DOMContentLoaded", loadUserLinks);
 
-    </script>
+        function showNotification(message, type = 'success') {
+            const panel = document.getElementById('notificationPanel');
+            panel.textContent = message;
 
+            panel.className = "fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center z-50";
+
+            if (type === 'success') {
+                panel.classList.add("bg-green-500");
+            } else if (type === 'error') {
+                panel.classList.add("bg-red-500");
+            } else if (type === 'warning') {
+                panel.classList.add("bg-yellow-500");
+            } else {
+                panel.classList.add("bg-gray-700");
+            }
+
+            panel.classList.remove("hidden");
+
+            setTimeout(() => {
+                panel.classList.add("hidden");
+            }, 5000);
+        }
+
+    </script>
+    
+    <div 
+        id="notificationPanel" 
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center hidden z-50">
+    </div>
     <!-- Footer -->
     <footer class="mt-auto mb-4 text-pink-500 text-sm animate__animated animate__fadeInUp text-center">
         &copy; 2025 AlignMe. All rights reserved.
