@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectTreeController;
+use App\Http\Controllers\ViewerController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,3 +45,7 @@ Route::get('/vote', function() {
 Route::get('/force-tree', function() {
     return view('forcedirectedtree');
 });
+
+
+Route::get('/skosviewer/{fileId}', [ViewerController::class, 'show'])
+         ->name('skosviewer.show');

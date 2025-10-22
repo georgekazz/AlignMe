@@ -132,6 +132,7 @@
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Public</th>
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Created At</th>
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Parse</th>
+                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">SKOS Viewer</th>
                         </tr>
                     </thead>
                     <tbody id="filesTableBody" class="divide-y divide-gray-100">
@@ -277,7 +278,18 @@
                             ${file.parsed ? 'Parsed' : 'Parse'}
                         </button>
                     </td>
+                    <td class="border px-4 py-2 text-center">
+                        <button class="px-5 py-2 viewer-btn rounded-2xl font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg hover:from-purple-600 hover:to-indigo-500 transform hover:-translate-y-0.5 transition-all duration-300">
+                            SKOS Viewer
+                        </button>
+                    </td>
                 `;
+
+                const viewerButton = tr.querySelector('.viewer-btn');
+                    viewerButton.addEventListener('click', () => {
+                    window.open(`./skosviewer/${file.id}`, '_blank');
+                });
+
                 const button = tr.querySelector('button');
                 button.addEventListener('click', async () => {
                     try {
