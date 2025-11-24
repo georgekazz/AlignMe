@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - AlignMe</title>
+    <title>Login - Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/heroicons@2.0.18/dist/heroicons.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
@@ -15,7 +15,7 @@
 
     <div class="bg-white rounded-2xl shadow-2xl p-10 max-w-md w-full animate__animated animate__fadeInDown">
         <h2 class="text-3xl font-bold text-indigo-900 mb-6 text-center">Login to <span
-                class="text-yellow-400">AlignMe</span></h2>
+                class="text-yellow-400">Alignment</span></h2>
 
         <div class="mt-6 text-center">
             <button onclick="window.location.href='./'"
@@ -56,13 +56,14 @@
         </p>
     </div>
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const response = await fetch('http://127.0.0.1:8000/login', {
+            const response = await fetch(`${window.apiBaseUrl}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

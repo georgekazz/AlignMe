@@ -11,6 +11,7 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+
     #bgCanvas {
       position: fixed;
       inset: 0;
@@ -96,6 +97,7 @@
     </p>
   </div>
   <script>
+    window.apiBaseUrl = "{{ config('api.base_url') }}";
 
     const canvas = document.getElementById("bgCanvas");
     const ctx = canvas.getContext("2d");
@@ -159,7 +161,7 @@
       const password = document.getElementById('password').value;
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/register', {
+        const response = await fetch(`${window.apiBaseUrl}/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password })

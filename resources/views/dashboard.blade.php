@@ -13,7 +13,7 @@
 <body class="bg-indigo-100 min-h-screen">
 
     <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-5 flex justify-between items-center">
-        <h1 class="text-xl font-bold">AlignMe Dashboard</h1>
+        <h1 class="text-xl font-bold">Alignment Dashboard</h1>
         <button id="logoutBtn"
             class="bg-yellow-400 text-indigo-900 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-300">Logout</button>
     </header>
@@ -195,6 +195,7 @@
     </main>
 
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         const token = localStorage.getItem('token');
         if (!token) {
             alert('You must login first!');
@@ -202,7 +203,7 @@
         }
 
         async function loadUser() {
-            const response = await fetch('http://127.0.0.1:8000/me', {
+            const response = await fetch(`${window.apiBaseUrl}/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -229,7 +230,7 @@
 
         async function loadUserFiles() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/my-files/', {
+                const response = await fetch(`${window.apiBaseUrl}/my-files/`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
@@ -303,7 +304,7 @@
                 const button = tr.querySelector('button');
                 button.addEventListener('click', async () => {
                     try {
-                        const parseResp = await fetch(`http://127.0.0.1:8000/files/${file.id}/parse`, {
+                        const parseResp = await fetch(`${window.apiBaseUrl}/files/${file.id}/parse`, {
                             method: 'POST',
                             headers: { 'Authorization': 'Bearer ' + token }
                         });
@@ -349,7 +350,7 @@
 
         async function loadUserProjects() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/my-projects', {
+                const response = await fetch(`${window.apiBaseUrl}/my-projects`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
@@ -392,7 +393,7 @@
 
         async function loadUserLinks() {
             try {
-                const res = await fetch("http://127.0.0.1:8000/user-links/", {
+                const res = await fetch(`${window.apiBaseUrl}/user-links/`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const links = await res.json();
@@ -426,7 +427,7 @@
             if (!confirm("Are you sure you want to delete this link?")) return;
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/links/${linkId}`, {
+                const res = await fetch(`${window.apiBaseUrl}/links/${linkId}`, {
                     method: "DELETE",
                     headers: { "Authorization": "Bearer " + token }
                 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlignMe - Semantic Matching Tool</title>
+    <title>Alignment - Semantic Matching Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -36,7 +36,7 @@
     <div class="flex-1 flex flex-col justify-center items-center text-center px-4">
         <!-- Hero Section -->
         <div class="animate__animated animate__fadeInDown">
-            <h1 class="text-5xl md:text-6xl font-bold mb-4">Welcome to <span class="text-yellow-300">AlignMe</span></h1>
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">Welcome to <span class="text-yellow-300">Alignment</span></h1>
             <p class="text-lg md:text-xl mb-8">The ultimate semantic matching & RDF analysis tool for cultural heritage and linked data.</p>
             <div class="flex justify-center gap-4">
                 <a href="./login" class="btn-custom bg-yellow-400 text-indigo-900 px-6 py-3 rounded-full font-semibold shadow-md hover:bg-yellow-300 animate__animated animate__pulse animate__infinite">Get Started</a>

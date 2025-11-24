@@ -64,6 +64,7 @@
     </section>
 
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         let currentPage = 1;
         const itemsPerPage = 3;
         let filesData = [];
@@ -119,7 +120,7 @@
         async function loadUserFiles() {
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch('http://127.0.0.1:8000/my-files/', { headers: { 'Authorization': 'Bearer ' + token } });
+                const response = await fetch(`${window.apiBaseUrl}/my-files/`, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (!response.ok) throw new Error('Failed to fetch files');
                 filesData = await response.json();
                 currentPage = 1;
@@ -133,7 +134,7 @@
             const btn = document.getElementById(`convert-btn-${fileId}`);
             setLoading(btn, true);
             try {
-                const res = await fetch(`http://127.0.0.1:8000/files/${fileId}/convert`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+                const res = await fetch(`${window.apiBaseUrl}/files/${fileId}/convert`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { const err = await safeJson(res); alert('Conversion failed: ' + (err.detail || err.message || res.statusText)); return false; }
                 const data = await res.json();
                 showNotification('Conversion succeeded!', 'success');
@@ -160,7 +161,7 @@
             container.innerHTML = '<div class="p-4 text-gray-600">Loading graph...</div>';
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/files/${fileId}/graph`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const res = await fetch(`${window.apiBaseUrl}/files/${fileId}/graph`, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { const err = await safeJson(res); container.innerHTML = `<div class="p-4 text-red-600">Failed to load graph: ${escapeHtml(err.detail || err.message)}</div>`; return; }
                 const data = await res.json();
                 if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.links)) { container.innerHTML = `<div class="p-4 text-red-600">Server returned invalid graph data.</div>`; return; }
@@ -237,7 +238,7 @@
             infoDiv.style.display = "block";
             infoDiv.innerHTML = `<p class="text-sm text-gray-500">Loading...</p>`;
 
-            fetch(`http://127.0.0.1:8000/nodes/${fileId}/${encodeURIComponent(node.id)}`)
+            fetch(`${window.apiBaseUrl}/nodes/${fileId}/${encodeURIComponent(node.id)}`)
                 .then(res => {
                     if (!res.ok) throw new Error('Node not found');
                     return res.json();

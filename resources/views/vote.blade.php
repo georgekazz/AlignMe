@@ -47,11 +47,12 @@
     </div>
 
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         const token = localStorage.getItem("token");
 
         async function loadLinks() {
             try {
-                const res = await fetch("http://127.0.0.1:8000/links-vote", {
+                const res = await fetch(`${window.apiBaseUrl}/links-vote`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const data = await res.json();
@@ -116,7 +117,7 @@
             downBtn.disabled = true;
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/links/${linkId}/vote`, {
+                const res = await fetch(`${window.apiBaseUrl}/links/${linkId}/vote`, {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + token,

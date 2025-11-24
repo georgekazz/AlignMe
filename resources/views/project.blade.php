@@ -280,6 +280,7 @@
     </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         const pathSegments = window.location.pathname.split('/');
         const projectId = pathSegments[pathSegments.length - 1];
 
@@ -290,7 +291,7 @@
             if (!token) { alert("No token found. Please log in."); return; }
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/project-files/${projectId}`, {
+                const res = await fetch(`${window.apiBaseUrl}/project-files/${projectId}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (!res.ok) throw new Error("Failed to load project NT files");
@@ -310,7 +311,7 @@
         }
 
         function downloadOntology(projectId) {
-            const url = `http://127.0.0.1:8000/projects/${projectId}/export`;
+            const url = `${window.apiBaseUrl}/projects/${projectId}/export`;
 
             fetch(url)
                 .then(response => {
@@ -342,7 +343,7 @@
             detailsDiv.innerHTML = "<p class='text-gray-500'>Loading...</p>";
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/node-details/?project_id=${projectId}&uri=${encodeURIComponent(nodeData.uri)}`, {
+                const res = await fetch(`${window.apiBaseUrl}/node-details/?project_id=${projectId}&uri=${encodeURIComponent(nodeData.uri)}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
@@ -372,7 +373,7 @@
             suggestionsDiv.classList.remove("hidden");
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/projects/${projectId}/suggestions_full?node_uri=${encodeURIComponent(nodeData.uri)}`, {
+                const res = await fetch(`${window.apiBaseUrl}/projects/${projectId}/suggestions_full?node_uri=${encodeURIComponent(nodeData.uri)}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
@@ -477,7 +478,7 @@
             if (!group) return;
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/link-types?group=${group}`, {
+                const res = await fetch(`${window.apiBaseUrl}/link-types?group=${group}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 if (!res.ok) throw new Error("Failed to load link types");
@@ -532,7 +533,7 @@
 
                     console.log("Link payload:", payload);
 
-                    const res = await fetch(`http://127.0.0.1:8000/links/`, {
+                    const res = await fetch(`${window.apiBaseUrl}/links/`, {
                         method: "POST",
                         headers: {
                             'Authorization': 'Bearer ' + token,
@@ -561,7 +562,7 @@
         const exportBtn = document.getElementById('exportLinksBtn');
         exportBtn.addEventListener('click', async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:8000/projects/${projectId}/export-links`, {
+                const res = await fetch(`${window.apiBaseUrl}/projects/${projectId}/export-links`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
 

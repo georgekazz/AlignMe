@@ -212,13 +212,14 @@
     </div>
 
     <script>
+        window.apiBaseUrl = "{{ config('api.base_url') }}";
         function skosViewer() {
             return {
                 fileId: "{{ $fileId }}",
                 token: localStorage.getItem('token'),
                 projectId: 2,
                 data: [],
-                tree: [], // 🔹 Δεδομένα για το δενδρικό tab
+                tree: [],
                 selected: null,
                 filter: "",
                 letterFilter: "",
@@ -232,7 +233,7 @@
 
                 async loadSKOS() {
                     try {
-                        const res = await fetch(`http://127.0.0.1:8000/files/${this.fileId}/skos`, {
+                        const res = await fetch(`${window.apiBaseUrl}/files/${this.fileId}/skos`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
                         if (!res.ok) throw new Error('Αποτυχία φόρτωσης SKOS');
@@ -264,7 +265,7 @@
                 async selectConcept(item) {
                     try {
                         const encodedURI = encodeURIComponent(item.subject);
-                        const res = await fetch(`http://127.0.0.1:8000/node-details/?project_id=${this.projectId}&uri=${encodedURI}`, {
+                        const res = await fetch(`${window.apiBaseUrl}/node-details/?project_id=${this.projectId}&uri=${encodedURI}`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
                         if (!res.ok) throw new Error('Δεν βρέθηκαν λεπτομέρειες');
@@ -313,7 +314,7 @@
 
                 async buildTree() {
                     try {
-                        const res = await fetch(`http://127.0.0.1:8000/files/${this.fileId}/skos-tree`, {
+                        const res = await fetch(`${window.apiBaseUrl}/files/${this.fileId}/skos-tree`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
                         if (!res.ok) throw new Error('Αποτυχία φόρτωσης δενδρικής δομής');
