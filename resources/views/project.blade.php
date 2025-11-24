@@ -48,7 +48,7 @@
 
         .node-children {
              margin-left: 1.5rem;
-            border-left: 2px solid #cbd5e1; /* πιο έντονο και ορατό */
+            border-left: 2px solid #cbd5e1;
             padding-left: 0.75rem;
         }
 
@@ -101,7 +101,7 @@
         }
 
         .node-children .arrow {
-            color: #9ca3af; /* πιο απαλό για υπο-επίπεδα */
+            color: #9ca3af;
         }
         
         .hero-bg {
@@ -109,12 +109,12 @@
         }
 
         .node-children .node-card {
-            background: #f3f4f6; /* πιο ανοιχτό γκρι για παιδιά */
+            background: #f3f4f6;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .node-children .node-children .node-card {
-            background: #e5e7eb; /* ακόμα πιο ανοιχτό για επόμενα επίπεδα */
+            background: #e5e7eb;
         }
     </style>
 </head>
