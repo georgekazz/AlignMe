@@ -258,6 +258,8 @@
 
             files.forEach(file => {
                 const tr = document.createElement('tr');
+                const isParsed = file.parsed;
+
                 tr.innerHTML = `
                     <td class="border px-4 py-2 text-center">${file.id}</td>
                     <td class="border px-4 py-2 text-center">${file.filename}</td>
@@ -274,21 +276,29 @@
                     </td>
                     <td class="border px-4 py-2 text-center">${new Date(file.created_at).toLocaleString()}</td>
                     <td class="border px-4 py-2 text-center">
-                        <button class="px-3 py-1 rounded font-bold text-white ${file.parsed ? 'bg-green-500' : 'bg-red-500'}">
-                            ${file.parsed ? 'Parsed' : 'Parse'}
+                        <button class="px-3 py-1 rounded font-bold text-white ${isParsed ? 'bg-green-500' : 'bg-red-500'}">
+                            ${isParsed ? 'Parsed' : 'Parse'}
                         </button>
                     </td>
                     <td class="border px-4 py-2 text-center">
-                        <button class="px-5 py-2 viewer-btn rounded-2xl font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg hover:from-purple-600 hover:to-indigo-500 transform hover:-translate-y-0.5 transition-all duration-300">
+                        <button 
+                            class="px-5 py-2 viewer-btn rounded-2xl font-semibold text-white shadow-lg transform transition-all duration-300 
+                                ${isParsed 
+                                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-purple-600 hover:to-indigo-500 hover:-translate-y-0.5' 
+                                        : 'bg-gray-400 cursor-not-allowed opacity-70'}"
+                            ${!isParsed ? 'disabled' : ''}
+                        >
                             SKOS Viewer
                         </button>
                     </td>
                 `;
 
                 const viewerButton = tr.querySelector('.viewer-btn');
+                if (isParsed) {
                     viewerButton.addEventListener('click', () => {
-                    window.open(`./skosviewer/${file.id}`, '_blank');
-                });
+                        window.open(`./skosviewer/${file.id}`, '_blank');
+                    });
+                }
 
                 const button = tr.querySelector('button');
                 button.addEventListener('click', async () => {

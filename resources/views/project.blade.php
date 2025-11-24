@@ -278,7 +278,7 @@
             </div>
         </div>
     </div>
-
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         const pathSegments = window.location.pathname.split('/');
         const projectId = pathSegments[pathSegments.length - 1];
@@ -372,7 +372,7 @@
             suggestionsDiv.classList.remove("hidden");
 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/projects/${projectId}/suggestions?node_uri=${encodeURIComponent(nodeData.uri)}`, {
+                const res = await fetch(`http://127.0.0.1:8000/projects/${projectId}/suggestions_full?node_uri=${encodeURIComponent(nodeData.uri)}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
@@ -383,9 +383,8 @@
                         const div = document.createElement("div");
                         div.className = "suggestion-item p-2 border-b border-gray-200 cursor-pointer hover:bg-indigo-50";
                         div.innerHTML = `<strong>${s.label2}</strong> 
-                                 (<span class="text-indigo-600">${(s.similarity * 100).toFixed(0)}%</span>)`;
+                                        (<span class="text-indigo-600">${(s.similarity * 100).toFixed(0)}%</span>)`;
 
-                        // click για επιλογή
                         div.addEventListener("click", () => {
                             document.querySelectorAll(".suggestion-item").forEach(el => el.classList.remove("bg-indigo-100"));
                             div.classList.add("bg-indigo-100");
