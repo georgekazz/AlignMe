@@ -171,7 +171,7 @@
 
         if (response.ok) {
           alert('🎉 Registration successful! You can now login.');
-          window.location.href = './login;
+          window.location.href = './login';
         } else {
           alert('❌ Registration failed: ' + (data.detail || "Unknown error"));
         }
