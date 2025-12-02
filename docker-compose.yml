@@ -21,6 +21,8 @@ services:
       DB_PASSWORD: root
     depends_on:
       - db
+    networks:
+      - shared_align_network
 
   db:
     image: mysql:8.0
@@ -37,6 +39,13 @@ services:
       test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
       interval: 10s
       retries: 5
+    networks:
+      - shared_align_network
 
 volumes:
   db_data:
+
+networks:
+  shared_align_network:
+    external: true
+    name: shared_alignment_network
