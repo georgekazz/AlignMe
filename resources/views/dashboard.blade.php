@@ -132,6 +132,7 @@
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Public</th>
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Created At</th>
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Parse</th>
+                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Delete</th>
                             <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">SKOS Viewer</th>
                         </tr>
                     </thead>
@@ -281,6 +282,12 @@
                             ${isParsed ? 'Parsed' : 'Parse'}
                         </button>
                     </td>
+                    <td class="text-center">
+                        <button class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                onclick="deleteFile(${file.id})">
+                            Delete
+                        </button>
+                    </td>
                     <td class="border px-4 py-2 text-center">
                         <button 
                             class="px-5 py-2 viewer-btn rounded-2xl font-semibold text-white shadow-lg transform transition-all duration-300 
@@ -322,6 +329,28 @@
                 tbody.appendChild(tr);
             });
         }
+
+        async function deleteFile(fileId) {
+            if (!confirm("Are you sure you want to delete this file?")) return;
+
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(`${window.apiBaseUrl}/files/${fileId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert("File deleted successfully");
+                loadFiles();
+            } else {
+                const err = await response.json();
+                alert("Error: " + err.detail);
+            }
+        }
+
 
         function setupPagination() {
             const pagination = document.getElementById('pagination');

@@ -14,16 +14,18 @@
     <div class="max-w-7xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-2xl" x-data="skosViewer()" x-init="init()">
 
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse">SKOS Viewer</h1>
+            <h1
+                class="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse">
+                SKOS Viewer</h1>
             <span class="text-gray-600">📄 File ID: <strong x-text="fileId"></strong></span>
         </div>
 
         <!-- Back Button -->
         <div class="mb-4">
             <a href="../dashboard"
-            class="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-800 transition">
+                class="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-800 transition">
                 <img src="../img/back-icon.png" alt="List Icon" class="w-5 h-5">
-                <span>Επιστροφή στην αρχική</span>
+                <span>Return to Dashboard</span>
             </a>
         </div>
 
@@ -49,11 +51,11 @@
         <div x-show="activeTab === 'list'">
             <div class="mb-6 space-y-4">
                 <div class="flex flex-wrap justify-between items-center gap-4">
-                    <input x-model="filter" placeholder="🔍 Αναζήτηση label ή URI..."
+                    <input x-model="filter" placeholder="Search label ή URI..."
                         class="p-2 border border-gray-300 rounded-lg w-80 focus:ring focus:ring-indigo-300" />
                     <button @click="loadSKOS()"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                        🔄 Επαναφόρτωση
+                        🔄 Reload
                     </button>
                 </div>
 
@@ -91,7 +93,7 @@
                             </tr>
                         </template>
                         <tr x-show="filteredItems().length === 0">
-                            <td colspan="2" class="text-center text-gray-500 py-4">Δεν βρέθηκαν αποτελέσματα</td>
+                            <td colspan="2" class="text-center text-gray-500 py-4">No results found</td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,7 +104,7 @@
                 <div
                     class="mt-10 bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl shadow-lg border border-indigo-100 animate-fadeIn">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-indigo-700 flex items-center gap-2">Λεπτομέρειες Concept</h2>
+                        <h2 class="text-2xl font-bold text-indigo-700 flex items-center gap-2">Details Concept</h2>
                         <button @click="selected = null"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md transition">
                             ← Επιστροφή
@@ -123,91 +125,141 @@
 
         <!-- TAB 2: Δενδρική Προβολή -->
         <div x-show="activeTab === 'tree'" x-transition>
-        <h2 class="text-xl font-semibold text-indigo-700 mb-4">Δενδρική Προβολή SKOS</h2>
+            <h2 class="text-xl font-semibold text-indigo-700 mb-4">SKOS Tree View</h2>
 
-        <div class="bg-gray-50 border rounded-lg p-4 max-h-[600px] overflow-y-auto">
-            <template x-if="tree.length === 0">
-            <p class="text-gray-500 italic">Δεν υπάρχει διαθέσιμη δενδρική δομή ακόμη.</p>
-            </template>
+            <div class="bg-gray-50 border rounded-lg p-4 max-h-[600px] overflow-y-auto">
 
-            <template x-for="node in tree" :key="node.uri">
-            <div class="ml-4 mt-2">
-                <details class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-                <summary class="cursor-pointer text-indigo-700 font-medium" x-text="node.label"></summary>
+                <!-- Μήνυμα αν δεν υπάρχει δέντρο -->
+                <template x-if="tree.length === 0">
+                    <p class="text-gray-500 italic">There is no tree structure available yet.</p>
+                </template>
 
-                <div class="ml-4 mt-2 text-sm text-gray-700">
-                    
-                    <div class="text-xs text-gray-500 mb-1">
-                    <a :href="node.uri" target="_blank" class="underline text-indigo-600" x-text="node.uri"></a>
-                    </div>
+                <!-- Root nodes -->
+                <template x-for="node in tree" :key="node.uri">
+                    <div x-data="{ node: node }" class="ml-4 mt-2">
+                        <details class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
+                            <summary class="cursor-pointer text-indigo-700 font-medium" x-text="node.label"></summary>
 
-                    <template x-if="node.details && Object.keys(node.details).length">
-                    <div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
-                        <template x-for="[key, val] in Object.entries(node.details)" :key="key">
-                        <div>
-                            <span class="font-semibold text-gray-800" x-text="key + ':'"></span>
-                            <span x-html="
-                            Array.isArray(val)
-                                ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
-                                : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
-                            "></span>
-                        </div>
-                        </template>
-                    </div>
-                    </template>
-
-                    <!-- Παιδιά -->
-                    <template x-if="node.children && node.children.length">
-                    <div class="ml-6 border-l border-gray-200 pl-3 mt-2">
-                        <template x-for="child in node.children" :key="child.uri">
-                        <div class="mt-1">
-                            <div x-data="{ childNode: child }">
-                            
-                            <details class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-                                <summary class="cursor-pointer text-indigo-600 font-medium" x-text="childNode.label"></summary>
-                                <div class="ml-4 mt-1 text-sm text-gray-700">
-                                <div class="text-xs text-gray-500 mb-1">
-                                    <a :href="childNode.uri" target="_blank" class="underline text-indigo-600" x-text="childNode.uri"></a>
+                            <div class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
+                                <!-- URI -->
+                                <div class="text-xs text-gray-500">
+                                    <a :href="node.uri" target="_blank" class="underline text-indigo-600"
+                                        x-text="node.uri"></a>
                                 </div>
-                                <template x-if="childNode.details && Object.keys(childNode.details).length">
+
+                                <!-- Details -->
+                                <template x-if="node.details && Object.keys(node.details).length">
                                     <div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
-                                    <template x-for="[key, val] in Object.entries(childNode.details)" :key="key">
-                                        <div>
-                                        <span class="font-semibold text-gray-800" x-text="key + ':'"></span>
-                                        <span x-html="
+                                        <template x-for="[key, val] in Object.entries(node.details)" :key="key">
+                                            <div>
+                                                <span class="font-semibold text-gray-800" x-text="key + ':'"></span>
+                                                <span x-html="
                                             Array.isArray(val)
-                                            ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
-                                            : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
+                                                ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
+                                                : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
                                         "></span>
-                                        </div>
-                                    </template>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
 
-                                <template x-if="childNode.children && childNode.children.length">
-                                    <div class="ml-6 border-l border-gray-200 pl-3 mt-2">
-                                    <template x-for="subchild in childNode.children" :key="subchild.uri">
-                                        <div x-data="{ childNode: subchild }">
-                                        <!-- αναδρομικά -->
-                                        </div>
-                                    </template>
+                                <!-- Children nodes (αναδρομή) -->
+                                <template x-if="node.children && node.children.length">
+                                    <div class="ml-4 border-l border-gray-200 pl-2 space-y-1">
+                                        <template x-for="child in node.children" :key="child.uri">
+                                            <div x-data="{ node: child }" class="mt-1">
+                                                <!-- Αναδρομή: επαναλαμβάνουμε ακριβώς το ίδιο template -->
+                                                <details
+                                                    class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
+                                                    <summary class="cursor-pointer text-indigo-600 font-medium"
+                                                        x-text="node.label"></summary>
+                                                    <div class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
+                                                        <div class="text-xs text-gray-500">
+                                                            <a :href="node.uri" target="_blank"
+                                                                class="underline text-indigo-600" x-text="node.uri"></a>
+                                                        </div>
+
+                                                        <template
+                                                            x-if="node.details && Object.keys(node.details).length">
+                                                            <div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
+                                                                <template
+                                                                    x-for="[key, val] in Object.entries(node.details)"
+                                                                    :key="key">
+                                                                    <div>
+                                                                        <span class="font-semibold text-gray-800"
+                                                                            x-text="key + ':'"></span>
+                                                                        <span x-html="
+                                                                    Array.isArray(val)
+                                                                        ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
+                                                                        : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
+                                                                "></span>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+
+                                                        <!-- Αναδρομή για επόμενα παιδιά -->
+                                                        <template x-if="node.children && node.children.length">
+                                                            <div class="ml-4 border-l border-gray-200 pl-2 space-y-1">
+                                                                <template x-for="grandchild in node.children"
+                                                                    :key="grandchild.uri">
+                                                                    <div x-data="{ node: grandchild }" class="mt-1">
+                                                                        <!-- Εδώ επαναλαμβάνεται το ίδιο structure -->
+                                                                        <details
+                                                                            class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
+                                                                            <summary
+                                                                                class="cursor-pointer text-indigo-600 font-medium"
+                                                                                x-text="node.label"></summary>
+                                                                            <!-- Και ξανά τα παιδιά, ίδια λογική -->
+                                                                            <div
+                                                                                class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
+                                                                                <div class="text-xs text-gray-500">
+                                                                                    <a :href="node.uri" target="_blank"
+                                                                                        class="underline text-indigo-600"
+                                                                                        x-text="node.uri"></a>
+                                                                                </div>
+                                                                                <template
+                                                                                    x-if="node.details && Object.keys(node.details).length">
+                                                                                    <div
+                                                                                        class="mt-1 pl-2 border-l border-gray-200 space-y-1">
+                                                                                        <template
+                                                                                            x-for="[key, val] in Object.entries(node.details)"
+                                                                                            :key="key">
+                                                                                            <div>
+                                                                                                <span
+                                                                                                    class="font-semibold text-gray-800"
+                                                                                                    x-text="key + ':'"></span>
+                                                                                                <span x-html="
+                                                                                            Array.isArray(val)
+                                                                                                ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
+                                                                                                : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
+                                                                                        "></span>
+                                                                                            </div>
+                                                                                        </template>
+                                                                                    </div>
+                                                                                </template>
+                                                                            </div>
+                                                                        </details>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+
+                                                    </div>
+                                                </details>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
 
-                                </div>
-                            </details>
                             </div>
-                        </div>
-                        </template>
+                        </details>
                     </div>
-                    </template>
+                </template>
 
-                </div>
-                </details>
             </div>
-            </template>
         </div>
-        </div>
+
 
     </div>
 

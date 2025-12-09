@@ -7,116 +7,8 @@
     <title>Project - AlignMe</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="./img/favicon.png" type="image/x-icon">
-    <style>
-        .tree-container {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .tree {
-            flex: 1;
-            border: 1px solid #ddddddff;
-            background: #f9fafb;
-            padding: 0.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-            border-radius: 0.5rem;
-        }
-
-        .node-card {
-            display: flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            margin-bottom: 0.25rem;
-            border-radius: 0.25rem;
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .node-card:hover {
-            background: #e0f2fe;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .node-card.selected {
-            background: #2563eb;
-            color: #fff;
-        }
-
-        .node-children {
-             margin-left: 1.5rem;
-            border-left: 2px solid #cbd5e1;
-            padding-left: 0.75rem;
-        }
-
-        .arrow {
-            width: 1rem;
-            height: 1rem;
-            margin-right: 0.25rem;
-            color: #6b7280;
-           transition: transform 0.2s ease;
-        }
-
-        .arrow-collapsed {
-            transform: rotate(-90deg);
-        }
-
-        #node-info {
-            transition: all 0.3s;
-            border-left: 4px solid #2563eb;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        #node-info h2 {
-            color: #1e3a8a;
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-key {
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .detail-value {
-            display: inline-block;
-            margin-left: 0.25rem;
-            background: #f3f4f6;
-            padding: 0.15rem 0.3rem;
-            border-radius: 0.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        #node-suggestions {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 1rem;
-        }
-
-        .node-children .arrow {
-            color: #9ca3af;
-        }
-        
-        .hero-bg {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-        }
-
-        .node-children .node-card {
-            background: #f3f4f6;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .node-children .node-children .node-card {
-            background: #e5e7eb;
-        }
-    </style>
+    <link rel="icon" href="../img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/project.css">
 </head>
 
 <body class="hero-bg min-h-screen p-6">
@@ -186,28 +78,51 @@
 
     <!-- Suggestions List -->
     <div id="node-suggestions"
-        class="hidden bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6 max-w-3xl mx-auto animate__animated animate__fadeInUp">
+         class="hidden bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 
+            w-full max-w-7xl mx-auto 
+            max-h-[100vh] overflow-y-auto
+            animate__animated animate__fadeInUp">
 
-        <h3 class="text-xl font-bold mb-4 text-indigo-900 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
-            </svg>
-            Suggestions
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
+                </svg>
+                Matching Suggestions
+            </h3>
 
-        <div id="suggestions-list" class="text-gray-700 text-sm space-y-2"></div>
+            <!-- Info tooltip -->
+            <div class="group relative">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 hover:text-indigo-600 cursor-help"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div
+                    class="hidden group-hover:block absolute right-0 top-6 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-10">
+                    <strong>Match Quality:</strong><br>
+                    • 90-100%: Excellent match<br>
+                    • 70-89%: Good match<br>
+                    • 50-69%: Moderate match<br>
+                    • Below 50%: Weak match
+                </div>
+            </div>
+        </div>
+
+        <div id="suggestions-list" class="space-y-3"></div>
     </div>
 
 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto my-10">
+
     <!-- Create Link Section -->
     <div
-        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto my-6 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
+        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
 
         <h3 class="text-2xl font-bold text-indigo-900 mb-6 text-center">Create Link</h3>
 
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <!-- Category -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
             <div class="flex-1 flex flex-col">
                 <label for="linkCategory" class="text-sm font-medium mb-1">Category</label>
                 <select id="linkCategory"
@@ -219,7 +134,6 @@
                 </select>
             </div>
 
-            <!-- Type -->
             <div class="flex-1 flex flex-col">
                 <label for="linkTypeSelect" class="text-sm font-medium mb-1">Type</label>
                 <select id="linkTypeSelect"
@@ -229,11 +143,10 @@
             </div>
         </div>
 
-        <!-- Create Link Button -->
         <div class="flex justify-center">
             <button id="createLinkBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-                   bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg 
-                   hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
+                bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg 
+                hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
@@ -244,40 +157,38 @@
     </div>
 
     <!-- Export Section -->
-    <div class="flex justify-center mt-10">
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-xl text-center 
-              transform transition duration-500 hover:scale-[1.02]">
+    <div
+        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
 
-            <h3 class="text-2xl font-bold text-indigo-900 mb-6">Export Options</h3>
+        <h3 class="text-2xl font-bold text-indigo-900 mb-6 text-center">Export Options</h3>
 
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
 
-                <!-- Export Links -->
-                <button id="exportLinksBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-               bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg 
-               hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
-                    </svg>
-                    Export Links
-                </button>
+            <button id="exportLinksBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
+                bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg 
+                hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
+                </svg>
+                Export Links
+            </button>
 
-                <!-- Export Ontology -->
-                <button onclick="downloadOntology(projectId)" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-               bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg 
-               hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-105">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Export Ontology
-                </button>
+            <button onclick="downloadOntology(projectId)" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
+                bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg 
+                hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Export Ontology
+            </button>
 
-            </div>
         </div>
     </div>
+</div>
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         window.apiBaseUrl = "{{ config('api.base_url') }}";
@@ -369,7 +280,7 @@
         async function showNodeSuggestions(nodeData) {
             const suggestionsDiv = document.getElementById("node-suggestions");
             const suggestionsList = document.getElementById("suggestions-list");
-            suggestionsList.innerHTML = "<p class='text-gray-500'>Loading suggestions...</p>";
+            suggestionsList.innerHTML = "<p class='text-gray-500 text-center py-4'>Loading suggestions...</p>";
             suggestionsDiv.classList.remove("hidden");
 
             try {
@@ -379,34 +290,203 @@
                 const data = await res.json();
 
                 suggestionsList.innerHTML = "";
+
                 if (data.suggestions.length > 0) {
-                    data.suggestions.forEach(s => {
-                        const div = document.createElement("div");
-                        div.className = "suggestion-item p-2 border-b border-gray-200 cursor-pointer hover:bg-indigo-50";
-                        div.innerHTML = `<strong>${s.label2}</strong> 
-                                        (<span class="text-indigo-600">${(s.similarity * 100).toFixed(0)}%</span>)`;
+                    // Separate exact matches from others
+                    const exactMatches = data.suggestions.filter(s => s.is_exact_match);
+                    const otherMatches = data.suggestions.filter(s => !s.is_exact_match);
 
-                        div.addEventListener("click", () => {
-                            document.querySelectorAll(".suggestion-item").forEach(el => el.classList.remove("bg-indigo-100"));
-                            div.classList.add("bg-indigo-100");
-                            selectedSuggestion = s;
-                            console.log("Selected suggestion:", selectedSuggestion);
+                    // Show exact matches first
+                    if (exactMatches.length > 0) {
+                        const exactHeader = document.createElement("div");
+                        exactHeader.className = "mb-3 pb-2 border-b-2 border-green-500";
+                        exactHeader.innerHTML = `
+                    <span class="text-sm font-semibold text-green-700 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Exact Matches (${exactMatches.length})
+                    </span>
+                `;
+                        suggestionsList.appendChild(exactHeader);
+
+                        exactMatches.forEach(s => {
+                            suggestionsList.appendChild(createSuggestionCard(s, true));
                         });
+                    }
 
-                        suggestionsList.appendChild(div);
-                    });
+                    // Show other matches
+                    if (otherMatches.length > 0) {
+                        const otherHeader = document.createElement("div");
+                        otherHeader.className = "mt-6 mb-3 pb-2 border-b-2 border-blue-300";
+                        otherHeader.innerHTML = `
+                    <span class="text-sm font-semibold text-blue-700">
+                        Similar Matches (${otherMatches.length})
+                    </span>
+                `;
+                        suggestionsList.appendChild(otherHeader);
+
+                        otherMatches.forEach(s => {
+                            suggestionsList.appendChild(createSuggestionCard(s, false));
+                        });
+                    }
+
                 } else {
-                    suggestionsList.innerHTML = "<p class='text-gray-500'>No suggestions found</p>";
+                    suggestionsList.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-gray-500 font-medium">No suggestions found</p>
+                    <p class="text-gray-400 text-sm mt-1">Try selecting a different node</p>
+                </div>
+            `;
                 }
 
+                // Update progress bar
                 let maxSim = data.suggestions.length > 0 ? Math.max(...data.suggestions.map(s => s.similarity)) : 0;
                 document.getElementById("suggestionsProgress").style.width = (maxSim * 100) + "%";
-                document.getElementById("suggestionsCount").textContent = `Highest similarity: ${(maxSim * 100).toFixed(0)}%`;
+                document.getElementById("suggestionsCount").textContent = `Best match: ${(maxSim * 100).toFixed(0)}%`;
 
             } catch (err) {
-                suggestionsList.innerHTML = "<p class='text-red-600'>Error loading suggestions</p>";
+                suggestionsList.innerHTML = `
+            <div class="text-center py-8">
+                <svg class="w-12 h-12 mx-auto text-red-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-red-600 font-medium">Error loading suggestions</p>
+                <p class="text-gray-500 text-sm mt-1">${err.message}</p>
+            </div>
+        `;
                 console.error(err);
             }
+        }
+
+        function createSuggestionCard(suggestion, isExact) {
+            const card = document.createElement("div");
+            card.className = "suggestion-card bg-white rounded-lg p-4 cursor-pointer shadow-sm hover:shadow-md border border-gray-200";
+
+            const similarity = suggestion.similarity * 100;
+            const scoreClass = getScoreClass(similarity);
+            const scoreBarClass = getScoreBarClass(similarity);
+
+            // Get the scores object with defaults
+            const scores = suggestion.scores || {
+                label: suggestion.similarity,
+                definition: 0,
+                parent: 0,
+                child: 0,
+                sibling: 0
+            };
+
+            card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                    ${isExact ? `
+                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            EXACT
+                        </span>
+                    ` : ''}
+                    <h4 class="font-semibold text-gray-800 truncate">${suggestion.label2}</h4>
+                </div>
+                
+                ${suggestion.all_labels && suggestion.all_labels.length > 1 ? `
+                    <div class="text-xs text-gray-500 mb-2">
+                        Also known as: ${suggestion.all_labels.slice(1).map(l => `<span class="detail-badge">${l}</span>`).join(' ')}
+                    </div>
+                ` : ''}
+                
+                <!-- Score bar -->
+                <div class="score-bar-container mb-3">
+                    <div class="score-bar ${scoreBarClass}" style="width: ${similarity}%"></div>
+                </div>
+                
+                <!-- Main score and expand button -->
+                <div class="flex items-center justify-between">
+                    <span class="score-pill ${scoreClass}">${similarity.toFixed(1)}% Match</span>
+                    
+                    <button class="expand-btn text-xs text-gray-500 hover:text-indigo-600 flex items-center gap-1">
+                        <span>Details</span>
+                        <svg class="expand-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Expandable details -->
+                <div class="score-details hidden mt-3 pt-3 border-t border-gray-200">
+                    <div class="text-xs text-gray-600 mb-2 font-medium">Score Breakdown:</div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        ${createScoreDetail('Label', scores.label * 100, '📝')}
+                        ${createScoreDetail('Definition', scores.definition * 100, '📄')}
+                        ${createScoreDetail('Parent', scores.parent * 100, '⬆️')}
+                        ${createScoreDetail('Child', scores.child * 100, '⬇️')}
+                        ${createScoreDetail('Sibling', scores.sibling * 100, '↔️')}
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <strong>URI:</strong> <code class="bg-gray-100 px-1 rounded">${suggestion.node2}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+            // Click to select
+            card.addEventListener("click", (e) => {
+                // Don't select if clicking the expand button
+                if (e.target.closest('.expand-btn')) return;
+
+                document.querySelectorAll(".suggestion-card").forEach(el => el.classList.remove("selected"));
+                card.classList.add("selected");
+                selectedSuggestion = suggestion;
+                console.log("Selected suggestion:", selectedSuggestion);
+            });
+
+            // Expand/collapse details
+            const expandBtn = card.querySelector('.expand-btn');
+            const details = card.querySelector('.score-details');
+            const expandIcon = card.querySelector('.expand-icon');
+
+            expandBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                details.classList.toggle('hidden');
+                expandIcon.classList.toggle('expanded');
+            });
+
+            return card;
+        }
+
+        function createScoreDetail(label, score, emoji) {
+            const percentage = score.toFixed(0);
+            const color = score >= 70 ? 'text-green-600' : score >= 40 ? 'text-blue-600' : 'text-gray-400';
+
+            return `
+        <div class="text-center p-2 bg-gray-50 rounded">
+            <div class="text-lg">${emoji}</div>
+            <div class="text-xs font-medium text-gray-600">${label}</div>
+            <div class="text-sm font-bold ${color}">${percentage}%</div>
+        </div>
+    `;
+        }
+
+        function getScoreClass(score) {
+            if (score >= 90) return 'score-excellent';
+            if (score >= 70) return 'score-good';
+            if (score >= 50) return 'score-moderate';
+            return 'score-weak';
+        }
+
+        function getScoreBarClass(score) {
+            if (score >= 90) return 'score-bar-excellent';
+            if (score >= 70) return 'score-bar-good';
+            if (score >= 50) return 'score-bar-moderate';
+            return 'score-bar-weak';
         }
 
         let selectedNodeData = null;
@@ -416,31 +496,35 @@
             container.html("");
 
             function createNode(nodeData, parentDiv) {
-                const nodeDiv = parentDiv.append("div");
+                // Δημιουργία node
+                const nodeDiv = parentDiv.append("div").attr("class", "node-wrapper");
                 const card = nodeDiv.append("div")
                     .attr("class", "node-card flex items-center")
                     .text(nodeData.name);
 
                 let childrenDiv;
                 if (nodeData.children && nodeData.children.length > 0) {
-                    card.html(`<svg class="arrow" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M9 6l6 6-6 6"/>
-                    </svg>` + nodeData.name);
+                    
+                    card.html(`<svg class="arrow mr-2" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M9 6l6 6-6 6"/>
+                            </svg>${nodeData.name}`);
 
                     childrenDiv = nodeDiv.append("div")
                         .attr("class", "node-children")
-                        .style("display", "block");
+                        .style("display", "block"); 
 
+                    // Αναδρομή για κάθε παιδί
                     nodeData.children.forEach(child => createNode(child, childrenDiv));
                 }
 
-                card.on("click", () => {
+                
+                card.on("click", (event) => {
+                    event.stopPropagation();
                     showNodeInfo(nodeData);
 
                     if (selectedNode) selectedNode.classed("selected", false);
                     card.classed("selected", true);
                     selectedNode = card;
-
                     selectedNodeData = nodeData;
 
                     if (childrenDiv) {
@@ -451,8 +535,13 @@
                 });
             }
 
-            createNode(data, container);
+            if (Array.isArray(data)) {
+                data.forEach(node => createNode(node, container));
+            } else {
+                createNode(data, container);
+            }
         }
+
 
         loadProjectFiles();
 
@@ -472,7 +561,6 @@
         groupSelect.addEventListener("change", async () => {
             const group = groupSelect.value;
 
-            // Reset dropdown
             linkTypeSelect.innerHTML = `<option value="">-- Select Type --</option>`;
 
             if (!group) return;
@@ -570,7 +658,6 @@
 
                 const data = await res.json();
 
-                // Δημιουργία blob και download
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
