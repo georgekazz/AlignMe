@@ -12,7 +12,7 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
-      API_BASE_URL: "http://192.168.6.123:7861"
+      API_BASE_URL: "http://api.alignment.okfn.gr"
       APP_URL: http://localhost:8000
       DB_CONNECTION: mysql
       DB_HOST: db
