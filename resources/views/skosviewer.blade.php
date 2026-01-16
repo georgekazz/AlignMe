@@ -128,140 +128,64 @@
             <h2 class="text-xl font-semibold text-indigo-700 mb-4">SKOS Tree View</h2>
 
             <div class="bg-gray-50 border rounded-lg p-4 max-h-[600px] overflow-y-auto">
-
-                <!-- Μήνυμα αν δεν υπάρχει δέντρο -->
                 <template x-if="tree.length === 0">
                     <p class="text-gray-500 italic">There is no tree structure available yet.</p>
                 </template>
 
-                <!-- Root nodes -->
-                <template x-for="node in tree" :key="node.uri">
-                    <div x-data="{ node: node }" class="ml-4 mt-2">
-                        <details class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-                            <summary class="cursor-pointer text-indigo-700 font-medium" x-text="node.label"></summary>
-
-                            <div class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
-                                <!-- URI -->
-                                <div class="text-xs text-gray-500">
-                                    <a :href="node.uri" target="_blank" class="underline text-indigo-600"
-                                        x-text="node.uri"></a>
-                                </div>
-
-                                <!-- Details -->
-                                <template x-if="node.details && Object.keys(node.details).length">
-                                    <div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
-                                        <template x-for="[key, val] in Object.entries(node.details)" :key="key">
-                                            <div>
-                                                <span class="font-semibold text-gray-800" x-text="key + ':'"></span>
-                                                <span x-html="
-                                            Array.isArray(val)
-                                                ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
-                                                : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
-                                        "></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
-
-                                <!-- Children nodes (αναδρομή) -->
-                                <template x-if="node.children && node.children.length">
-                                    <div class="ml-4 border-l border-gray-200 pl-2 space-y-1">
-                                        <template x-for="child in node.children" :key="child.uri">
-                                            <div x-data="{ node: child }" class="mt-1">
-                                                <!-- Αναδρομή: επαναλαμβάνουμε ακριβώς το ίδιο template -->
-                                                <details
-                                                    class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-                                                    <summary class="cursor-pointer text-indigo-600 font-medium"
-                                                        x-text="node.label"></summary>
-                                                    <div class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
-                                                        <div class="text-xs text-gray-500">
-                                                            <a :href="node.uri" target="_blank"
-                                                                class="underline text-indigo-600" x-text="node.uri"></a>
-                                                        </div>
-
-                                                        <template
-                                                            x-if="node.details && Object.keys(node.details).length">
-                                                            <div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
-                                                                <template
-                                                                    x-for="[key, val] in Object.entries(node.details)"
-                                                                    :key="key">
-                                                                    <div>
-                                                                        <span class="font-semibold text-gray-800"
-                                                                            x-text="key + ':'"></span>
-                                                                        <span x-html="
-                                                                    Array.isArray(val)
-                                                                        ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
-                                                                        : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
-                                                                "></span>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                        </template>
-
-                                                        <!-- Αναδρομή για επόμενα παιδιά -->
-                                                        <template x-if="node.children && node.children.length">
-                                                            <div class="ml-4 border-l border-gray-200 pl-2 space-y-1">
-                                                                <template x-for="grandchild in node.children"
-                                                                    :key="grandchild.uri">
-                                                                    <div x-data="{ node: grandchild }" class="mt-1">
-                                                                        <!-- Εδώ επαναλαμβάνεται το ίδιο structure -->
-                                                                        <details
-                                                                            class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-                                                                            <summary
-                                                                                class="cursor-pointer text-indigo-600 font-medium"
-                                                                                x-text="node.label"></summary>
-                                                                            <!-- Και ξανά τα παιδιά, ίδια λογική -->
-                                                                            <div
-                                                                                class="ml-4 mt-2 text-sm text-gray-700 space-y-2">
-                                                                                <div class="text-xs text-gray-500">
-                                                                                    <a :href="node.uri" target="_blank"
-                                                                                        class="underline text-indigo-600"
-                                                                                        x-text="node.uri"></a>
-                                                                                </div>
-                                                                                <template
-                                                                                    x-if="node.details && Object.keys(node.details).length">
-                                                                                    <div
-                                                                                        class="mt-1 pl-2 border-l border-gray-200 space-y-1">
-                                                                                        <template
-                                                                                            x-for="[key, val] in Object.entries(node.details)"
-                                                                                            :key="key">
-                                                                                            <div>
-                                                                                                <span
-                                                                                                    class="font-semibold text-gray-800"
-                                                                                                    x-text="key + ':'"></span>
-                                                                                                <span x-html="
-                                                                                            Array.isArray(val)
-                                                                                                ? val.map(v => v.startsWith('http') ? `<a href='${v}' target='_blank' class='text-indigo-600 underline'>${v}</a>` : v).join(', ')
-                                                                                                : (val.startsWith('http') ? `<a href='${val}' target='_blank' class='text-indigo-600 underline'>${val}</a>` : val)
-                                                                                        "></span>
-                                                                                            </div>
-                                                                                        </template>
-                                                                                    </div>
-                                                                                </template>
-                                                                            </div>
-                                                                        </details>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                        </template>
-
-                                                    </div>
-                                                </details>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
-
-                            </div>
-                        </details>
-                    </div>
-                </template>
-
+                <div class="space-y-2">
+                    <template x-for="node in tree" :key="node.uri">
+                        <div x-html="renderNode(node)"></div>
+                    </template>
+                </div>
             </div>
         </div>
 
 
     </div>
+    <script>
+        function renderNode(node) {
+            
+            const detailsHtml = node.details && Object.keys(node.details).length
+                ? `<div class="mt-1 pl-2 border-l border-gray-200 space-y-1">
+                ${Object.entries(node.details).map(([key, val]) => `
+                    <div>
+                        <span class="font-semibold text-gray-800">${key}:</span>
+                        <span class="text-gray-700">${formatValue(val)}</span>
+                    </div>
+                `).join('')}
+               </div>`
+                : '';
+
+            const childrenHtml = node.children && node.children.length
+                ? `<div class="ml-6 border-l border-gray-200 pl-2 mt-2 space-y-2">
+                ${node.children.map(child => renderNode(child)).join('')}
+               </div>`
+                : '';
+
+            return `
+            <details class="bg-white p-2 rounded-md shadow-sm border border-gray-200">
+                <summary class="cursor-pointer text-indigo-700 font-medium hover:text-indigo-900">
+                    ${node.label}
+                </summary>
+                <div class="ml-4 mt-2 text-sm">
+                    <div class="text-xs text-gray-500 mb-2">
+                        <a href="${node.uri}" target="_blank" class="underline text-indigo-600">${node.uri}</a>
+                    </div>
+                    ${detailsHtml}
+                    ${childrenHtml}
+                </div>
+            </details>
+        `;
+        }
+
+        function formatValue(val) {
+            const format = (v) => v.startsWith('http')
+                ? `<a href="${v}" target="_blank" class="text-indigo-600 underline">${v}</a>`
+                : v;
+
+            return Array.isArray(val) ? val.map(format).join(', ') : format(val);
+        }
+    </script>
 
     <script>
         window.apiBaseUrl = "{{ config('api.base_url') }}";
@@ -269,7 +193,6 @@
             return {
                 fileId: "{{ $fileId }}",
                 token: localStorage.getItem('token'),
-                projectId: 2,
                 data: [],
                 tree: [],
                 selected: null,
@@ -288,11 +211,11 @@
                         const res = await fetch(`${window.apiBaseUrl}/files/${this.fileId}/skos`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
-                        if (!res.ok) throw new Error('Αποτυχία φόρτωσης SKOS');
+                        if (!res.ok) throw new Error('Error loading SKOS');
                         const json = await res.json();
                         this.data = json.labels || [];
                     } catch (err) {
-                        alert('Σφάλμα φόρτωσης SKOS: ' + err.message);
+                        alert('Error loading SKOS: ' + err.message);
                     }
                 },
 
@@ -317,19 +240,26 @@
                 async selectConcept(item) {
                     try {
                         const encodedURI = encodeURIComponent(item.subject);
-                        const res = await fetch(`${window.apiBaseUrl}/node-details/?project_id=${this.projectId}&uri=${encodedURI}`, {
+
+                        const res = await fetch(`${window.apiBaseUrl}/node-details-skostree/?file_id=${this.fileId}&uri=${encodedURI}`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
-                        if (!res.ok) throw new Error('Δεν βρέθηκαν λεπτομέρειες');
+
+                        if (!res.ok) throw new Error('No details found');
+
                         const json = await res.json();
+
                         const selected = { Label: item.label, URI: item.subject };
+
                         for (const key in json.details) {
                             const values = Array.isArray(json.details[key])
                                 ? [...new Set(json.details[key])]
                                 : [json.details[key]];
                             selected[key] = values.length === 1 ? values[0] : values;
                         }
+
                         this.selected = selected;
+
                     } catch (err) {
                         alert('⚠️ ' + err.message);
                         this.selected = { Label: item.label, URI: item.subject };
@@ -369,10 +299,10 @@
                         const res = await fetch(`${window.apiBaseUrl}/files/${this.fileId}/skos-tree`, {
                             headers: { 'Authorization': 'Bearer ' + this.token }
                         });
-                        if (!res.ok) throw new Error('Αποτυχία φόρτωσης δενδρικής δομής');
+                        if (!res.ok) throw new Error('Failed to load tree structure');
                         this.tree = await res.json();
                     } catch (err) {
-                        alert('Σφάλμα: ' + err.message);
+                        alert('Error: ' + err.message);
                         this.tree = [];
                     }
                 }

@@ -14,17 +14,16 @@
 <body class="hero-bg min-h-screen p-6">
 
     <!-- Back Button -->
-    <div class="mb-6">
+  <div class="mb-8">
         <button onclick="window.history.back()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition transform hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
+            class="group inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
-            Back to Dashboard
+            <span class="font-semibold">Back to Dashboard</span>
         </button>
     </div>
-
+    
     <!-- Trees Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div id="tree1"
@@ -54,9 +53,10 @@
     <div class="flex flex-col items-center gap-6 mb-8 max-w-3xl mx-auto">
 
         <!-- Generate Suggestions Button -->
-        <button id="generateSuggestionsBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-full 
-               bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow-lg
-               hover:from-green-600 hover:to-green-800 transform transition-all duration-300 hover:scale-105">
+        <button id="generateSuggestionsBtn" 
+                class="mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-full 
+                    bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow-lg
+                    hover:from-green-600 hover:to-green-800 transform transition-all duration-300 hover:scale-105">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -157,36 +157,38 @@
     </div>
 
     <!-- Export Section -->
-    <div
-        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
-
-        <h3 class="text-2xl font-bold text-indigo-900 mb-6 text-center">Export Options</h3>
-
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-
-            <button id="exportLinksBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-                bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-semibold shadow-lg 
-                hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 border-2 border-white/50 transform transition duration-300 hover:shadow-purple-500/20">
+            <h3 class="text-2xl font-bold text-indigo-900 mb-6 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Export Links
-            </button>
+                Export Options
+            </h3>
 
-            <button onclick="downloadOntology(projectId)" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-                bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg 
-                hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-105">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                Export Ontology
-            </button>
+            <div class="flex flex-col gap-4">
+                <button id="exportLinksBtn" 
+                    class="flex items-center justify-center gap-3 px-6 py-4 rounded-xl 
+                    bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-bold shadow-xl text-lg
+                    hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
+                    </svg>
+                    Export Links
+                </button>
 
-        </div>
-    </div>
+                <button onclick="downloadOntology(projectId)" 
+                    class="flex items-center justify-center gap-3 px-6 py-4 rounded-xl 
+                    bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-xl text-lg
+                    hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Export Ontology
+                </button>
+            </div>
 </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -437,9 +439,7 @@
         </div>
     `;
 
-            // Click to select
             card.addEventListener("click", (e) => {
-                // Don't select if clicking the expand button
                 if (e.target.closest('.expand-btn')) return;
 
                 document.querySelectorAll(".suggestion-card").forEach(el => el.classList.remove("selected"));
@@ -511,9 +511,8 @@
 
                     childrenDiv = nodeDiv.append("div")
                         .attr("class", "node-children")
-                        .style("display", "block"); 
+                        .style("display", "none"); 
 
-                    // Αναδρομή για κάθε παιδί
                     nodeData.children.forEach(child => createNode(child, childrenDiv));
                 }
 
