@@ -4,195 +4,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AlignMe</title>
+    <title>Dashboard - Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="icon" href="./img/favicon.png" type="image/x-icon">
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 8s ease infinite;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .search-highlight {
+            background-color: #fef3c7;
+            transition: background-color 0.3s;
+        }
+    </style>
 </head>
 
-<body class="bg-indigo-100 min-h-screen">
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen">
 
-    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-5 flex justify-between items-center">
-        <h1 class="text-xl font-bold">Alignment Dashboard</h1>
-        <button id="logoutBtn"
-            class="bg-yellow-400 text-indigo-900 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-300">Logout</button>
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center overflow-hidden">
+                    <img src="./img/favicon.png" alt="Icon" class="w-6 h-6 object-contain">
+                </div>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                    Alignment
+                </h1>
+            </div>
+            <button id="logoutBtn"
+                class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-6 py-2.5 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
+                Logout
+            </button>
+        </div>
     </header>
 
-    <main class="p-10">
-        <h2 class="text-3xl font-extrabold mb-6 text-gray-800 flex items-center gap-2">
-            Welcome,
-            <span id="userName"
-                class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse">
-            </span>!
-        </h2>
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h2 class="text-4xl font-extrabold mb-2 text-gray-800">
+                Welcome back,
+                <span id="userName"
+                    class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+                </span>! 👋
+            </h2>
+            <p class="text-gray-600">Manage your RDF files, projects, and alignments all in one place.</p>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-
+        <!-- Quick Actions Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             <!-- Upload RDF File -->
-            <div class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="p-3 bg-indigo-100 text-indigo-600 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <div class="group bg-white p-6 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-indigo-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Upload RDF File</h3>
                 </div>
-                <p class="text-gray-600">Upload your RDF files to start creating projects.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Upload RDF</h3>
+                <p class="text-gray-600 text-sm mb-4">Upload your RDF files to get started</p>
                 <a href="./uploadfile"
-                    class="mt-4 inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all w-full justify-center font-medium">
+                    Upload File
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
-                    Upload
                 </a>
             </div>
 
             <!-- Create Project -->
-            <div class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="p-3 bg-green-100 text-green-600 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4.354a9 9 0 100 15.292M15 12h3m-6 0h.01M9 12H6" />
+            <div class="group bg-white p-6 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-green-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Create Project</h3>
                 </div>
-                <p class="text-gray-600">Combine parsed RDF files into a new project.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Create Project</h3>
+                <p class="text-gray-600 text-sm mb-4">Combine RDF files into projects</p>
                 <a href="./createproject"
-                    class="mt-4 inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all w-full justify-center font-medium">
+                    New Project
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
-                    Create
                 </a>
             </div>
 
             <!-- Vote -->
-            <div class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="p-3 bg-yellow-100 text-yellow-600 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 9l-5 5m0 0l-5-5m5 5V3m5 6h7m-7 0v12" />
+            <div class="group bg-white p-6 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-yellow-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-gradient-to-br from-yellow-500 to-orange-500 text-white rounded-xl group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Vote</h3>
                 </div>
-                <p class="text-gray-600">See suggested links for your projects and vote.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Vote</h3>
+                <p class="text-gray-600 text-sm mb-4">Review and vote on suggestions</p>
                 <a href="./vote"
-                    class="mt-4 inline-flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M14 9l-5 5m0 0l-5-5m5 5V3m5 6h7m-7 0v12" />
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all w-full justify-center font-medium">
+                    Start Voting
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
-                    Go
                 </a>
             </div>
 
             <!-- Direct Tree -->
-            <div
-                class="bg-gradient-to-br from-purple-50 to-purple-200 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1">
-                <div class="flex items-center space-x-4 mb-4">
-                    <div class="p-4 bg-white-800 text-white rounded-2xl shadow-inner">
-                        <div class="p-4 bg-white-500 text-white rounded-2xl shadow-inner">
-                            <p class="text-xl font-bold text-purple-800">Direct Tree</p>
-                        </div>
+            <div class="group bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-2xl shadow-md border-2 border-purple-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white text-purple-600 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                        </svg>
                     </div>
+                    <span class="bg-purple-600 text-white text-xs px-3 py-1 rounded-full font-semibold">Soon</span>
                 </div>
-
-                <p class="text-purple-700 mb-4">Visualize ontologies in an interactive force-directed graph.</p>
-
+                <h3 class="text-lg font-bold text-purple-900 mb-2">Direct Tree</h3>
+                <p class="text-purple-700 text-sm mb-4">Interactive force-directed graphs</p>
                 <button disabled
-                    class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-300 text-purple-600 cursor-not-allowed shadow-inner">
+                    class="w-full px-4 py-2 rounded-lg bg-purple-300 text-purple-600 cursor-not-allowed font-medium">
                     Coming Soon
                 </button>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-lg">
-            <h3 class="font-semibold text-xl text-gray-800 mb-6 text-center">Your Uploaded RDF Files</h3>
+     <!-- RDF Files Section -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl mb-8">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0 flex items-center gap-2">
+                    <span>📁</span>
+                    <span>Your RDF Files</span>
+                </h3>
+            </div>
 
-            <div class="overflow-hidden rounded-xl border border-gray-200 shadow-md">
-                <table class="min-w-full border-collapse bg-white">
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-xl border border-gray-200">
+                <table class="min-w-full border-collapse bg-white text-gray-700">
                     <thead>
                         <tr class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Filename</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Filetype</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Status</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Public</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Created At</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Parse</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Delete</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">SKOS Viewer</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-left">ID</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-left">Filename</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-left">Type</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-center">Status</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-center">Public</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-left">Created</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-center">Actions</th>
+                            <th class="px-6 py-3 text-sm font-semibold text-center"></th>
+                            <th class="px-6 py-3 text-sm font-semibold text-center"></th>
                         </tr>
                     </thead>
                     <tbody id="filesTableBody" class="divide-y divide-gray-100">
-                        <!-- Τα projects θα φορτωθούν εδώ με JS -->
+                        <!-- Populated dynamically by JS -->
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div id="pagination" class="flex justify-center mt-4 space-x-2"></div>
+            <div id="pagination" class="flex justify-center mt-6 space-x-2"></div>
         </div>
 
-        <!-- Πίνακας Projects -->
-        <div class="max-h-96 max-w-7xl mx-auto mt-8 bg-white p-6 rounded-2xl shadow-xl overflow-auto">
-            <h3 class="font-semibold text-xl text-gray-800 mb-6 text-center">Your Projects</h3>
+        <!-- Projects Section -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">🚀 Your Projects</h3>
+            </div>
 
-            <div class="overflow-hidden rounded-xl border border-gray-200 shadow-md">
+            <div class="overflow-x-auto rounded-xl border border-gray-200">
                 <table class="min-w-full table-auto border-collapse bg-white">
                     <thead>
                         <tr class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">ID</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Name</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">File 1</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">File 2</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Created At</th>
-                            <th class="px-6 py-3 text-sm font-semibold tracking-wide text-center">Action</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">ID</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">Name</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">File 1</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">File 2</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">Created</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center">Actions</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center"></th>
                         </tr>
                     </thead>
                     <tbody id="projectsTableBody" class="divide-y divide-gray-100">
-                        <!-- Τα projects θα φορτωθούν εδώ με JS -->
+                        <!-- Populated by JS -->
                     </tbody>
                 </table>
             </div>
         </div>
 
-
-        <div class="user-links-table max-h-96 max-w-7xl mx-auto mt-8 bg-white p-6 rounded-2xl shadow-xl overflow-auto">
-            <h3 class="text-3xl font-extrabold mb-6 text-gray-800 text-center">
-                My Links
-            </h3>
-            <table class="min-w-full table-auto border-collapse">
-                <thead>
-                    <tr class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Source</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Target</th>
-                        <th class="px-6 py-3 text-left text-sm font-semibold">Type</th>
-                        <th class="px-6 py-3 text-center text-sm font-semibold">Score</th>
-                        <th class="px-6 py-3 text-center text-sm font-semibold">Upvotes</th>
-                        <th class="px-6 py-3 text-center text-sm font-semibold">Downvotes</th>
-                        <th class="px-6 py-3 text-center text-sm font-semibold">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="userLinksBody" class="bg-white divide-y divide-gray-200">
-                    <!-- Dynamically populated rows -->
-                </tbody>
-            </table>
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteProjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Delete Project</h3>
+                        <p class="text-sm text-gray-500">This action cannot be undone</p>
+                    </div>
+                </div>
+                
+                <p class="text-gray-700 mb-6">
+                    Are you sure you want to delete "<span id="deleteProjectName" class="font-semibold"></span>"? 
+                    All associated links and votes will also be deleted.
+                </p>
+                
+                <div class="flex gap-3 justify-end">
+                    <button onclick="closeDeleteModal()" 
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                        Cancel
+                    </button>
+                    <button id="confirmDeleteBtn" 
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Delete Project
+                    </button>
+                </div>
+            </div>
         </div>
 
+        <!-- My Links Section -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">🔗 My Links</h3>
+            </div>
 
+            <div class="overflow-x-auto rounded-xl border border-gray-200">
+                <table class="min-w-full table-auto border-collapse">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white">
+                            <th class="px-6 py-4 text-sm font-semibold text-left">Source</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">Target</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-left">Type</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center">Score</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center">👍 Upvotes</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center">👎 Downvotes</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userLinksBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -263,44 +336,44 @@
                 const isParsed = file.parsed;
 
                 tr.innerHTML = `
-                    <td class="border px-4 py-2 text-center">${file.id}</td>
-                    <td class="border px-4 py-2 text-center">${file.filename}</td>
-                    <td class="border px-4 py-2 text-center">${file.filetype}</td>
-                    <td class="border px-4 py-2 text-center">${file.status}</td>
-                    <td class="border px-4 py-2 text-center">
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">${file.id}</td>
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">${file.filename}</td>
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">${file.filetype}</td>
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">${file.status}</td>
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">
                         ${file.public
                             ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>`
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>`
                             : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>`}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>`}
                     </td>
-                    <td class="border px-4 py-2 text-center">${new Date(file.created_at).toLocaleString()}</td>
-                    <td class="border px-4 py-2 text-center">
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">${new Date(file.created_at).toLocaleString()}</td>
+                    <td class="px-6 py-3 text-sm text-center whitespace-nowrap">
                         <button class="px-3 py-1 rounded font-bold text-white ${isParsed ? 'bg-green-500' : 'bg-red-500'}">
                             ${isParsed ? 'Parsed' : 'Parse'}
                         </button>
                     </td>
-                    <td class="text-center">
-                        <button class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                onclick="deleteFile(${file.id})">
-                            Delete
-                        </button>
-                    </td>
-                    <td class="border px-4 py-2 text-center">
-                        <button 
-                            class="px-5 py-2 viewer-btn rounded-2xl font-semibold text-white shadow-lg transform transition-all duration-300 
-                                ${isParsed 
+                    <td class="px-6 py-3 text-center whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-2">
+                            <button class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                    onclick="deleteFile(${file.id})">
+                                Delete
+                            </button>
+                            <button 
+                                class="px-4 py-1 viewer-btn rounded-2xl font-semibold text-white shadow-lg transform transition-all duration-300 
+                                    ${isParsed 
                                         ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-purple-600 hover:to-indigo-500 hover:-translate-y-0.5' 
                                         : 'bg-gray-400 cursor-not-allowed opacity-70'}"
-                            ${!isParsed ? 'disabled' : ''}
-                        >
-                            SKOS Viewer
-                        </button>
+                                ${!isParsed ? 'disabled' : ''}>
+                                SKOS Viewer
+                            </button>
+                        </div>
                     </td>
                 `;
 
+                // Event για SKOS Viewer
                 const viewerButton = tr.querySelector('.viewer-btn');
                 if (isParsed) {
                     viewerButton.addEventListener('click', () => {
@@ -308,8 +381,9 @@
                     });
                 }
 
-                const button = tr.querySelector('button');
-                button.addEventListener('click', async () => {
+                // Event για Parse button
+                const parseButton = tr.querySelector('td:nth-child(7) > button');
+                parseButton.addEventListener('click', async () => {
                     try {
                         const parseResp = await fetch(`${window.apiBaseUrl}/files/${file.id}/parse`, {
                             method: 'POST',
@@ -317,10 +391,15 @@
                         });
                         if (!parseResp.ok) throw new Error('Parsing failed');
 
-                        button.classList.remove('bg-red-500');
-                        button.classList.add('bg-green-500');
-                        button.textContent = 'Parsed';
+                        parseButton.classList.remove('bg-red-500');
+                        parseButton.classList.add('bg-green-500');
+                        parseButton.textContent = 'Parsed';
                         file.parsed = true;
+
+                        // Enable SKOS Viewer button dynamically
+                        viewerButton.disabled = false;
+                        viewerButton.classList.remove('bg-gray-400', 'cursor-not-allowed', 'opacity-70');
+                        viewerButton.classList.add('bg-gradient-to-r', 'from-indigo-500', 'to-purple-600');
                     } catch (err) {
                         showNotification('Parsing failed: ' + err.message, 'error');
                     }
@@ -329,6 +408,7 @@
                 tbody.appendChild(tr);
             });
         }
+
 
         async function deleteFile(fileId) {
             if (!confirm("Are you sure you want to delete this file?")) return;
@@ -371,9 +451,6 @@
             }
         }
 
-        // Σιγουρέψου ότι υπάρχει div για τα κουμπιά pagination
-        // <div id="pagination" class="flex justify-center mt-4 space-x-2"></div>
-
         loadUserFiles();
 
 
@@ -400,8 +477,25 @@
                 <td class="border px-4 py-2 text-center">${project.file2_name || '-'}</td>
                 <td class="border px-4 py-2 text-center">${new Date(project.created_at).toLocaleString()}</td>
                 <td class="border px-4 py-2 text-center">
-                    <button class="bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-600"
-                        onclick="goToProject(${project.id})">Open</button>
+                    <button 
+                        class="px-4 py-2 rounded-2xl font-semibold text-white shadow-lg
+                            bg-gradient-to-r from-indigo-500 to-purple-600
+                            hover:from-purple-600 hover:to-indigo-500
+                            transform transition-all duration-300 hover:-translate-y-0.5"
+                        onclick="goToProject(${project.id})">
+                        Open
+                    </button>
+                </td>
+                 <td class="px-6 py-4 text-sm text-center">
+                    <div class="flex items-center justify-center gap-2">   
+                        <button onclick="showDeleteModal(${project.id}, '${project.name}')" 
+                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-xs font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
                 </td>
             `;
                     tbody.appendChild(tr);
@@ -411,6 +505,85 @@
                 showNotification('Error loading projects', 'error');
             }
         }
+
+        let projectToDelete = null;
+
+        function showDeleteModal(projectId, projectName) {
+            projectToDelete = projectId;
+            document.getElementById('deleteProjectName').textContent = projectName;
+            document.getElementById('deleteProjectModal').classList.remove('hidden');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            projectToDelete = null;
+            document.getElementById('deleteProjectModal').classList.add('hidden');
+        }
+
+        // Confirm delete
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (!projectToDelete) return;
+            
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Deleting...
+            `;
+            
+            try {
+                 const response = await fetch(`${window.apiBaseUrl}/projects/${projectToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    alert(`✅ ${data.message}`);
+                    
+                    const rows = document.querySelectorAll('#projectsTableBody tr');
+                    rows.forEach(row => {
+                        if (row.querySelector('td')?.textContent === projectToDelete.toString()) {
+                            row.remove();
+                        }
+                    });
+                    
+                    closeDeleteModal();
+                } else {
+                    const error = await response.json();
+                    alert(`❌ Error: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('❌ Failed to delete project. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal on background click
+        document.getElementById('deleteProjectModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
 
 
         function goToProject(projectId) {

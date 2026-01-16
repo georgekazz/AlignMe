@@ -226,25 +226,30 @@
         function downloadOntology(projectId) {
             const url = `${window.apiBaseUrl}/projects/${projectId}/export`;
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("No ontology available for this project");
-                    }
-                    return response.blob();
-                })
-                .then(blob => {
-                    const a = document.createElement("a");
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `project_${projectId}_ontology.ttl`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                })
-                .catch(err => {
-                    alert(err.message);
-                    console.error(err);
-                });
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No ontology available for this project or not authenticated");
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `project_${projectId}_ontology.ttl`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(err => {
+                alert(err.message);
+                console.error(err);
+            });
         }
 
         async function showNodeInfo(nodeData) {
