@@ -9,12 +9,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="../img/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/project.css">
+    <style>
+        .search-highlight {
+            background-color: #fef08a !important;
+            animation: pulse 1s ease-in-out 2;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .model-selector {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+
+        .model-selector.expanded {
+            max-height: 300px;
+            padding: 1.5rem;
+        }
+
+        .model-option {
+            transition: all 0.2s ease;
+        }
+
+        .model-option:hover {
+            transform: translateX(4px);
+        }
+
+        .model-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
 </head>
 
 <body class="hero-bg min-h-screen p-6">
 
     <!-- Back Button -->
-  <div class="mb-8">
+    <div class="mb-8">
         <button onclick="window.history.back()"
             class="group inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -26,23 +62,41 @@
     
     <!-- Trees Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div id="tree1"
-            class="bg-white rounded-2xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft border border-gray-200">
-            <h3 class="font-bold text-indigo-900 text-lg mb-3 border-b border-gray-100 pb-2">Source</h3>
-            <div class="tree-container mt-2">
-                <!-- Nodes θα γεμίσουν με JS -->
+        <!-- Tree 1 with Search -->
+        <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-200">
+            <div class="mb-3 border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-indigo-900 text-lg mb-2">Source</h3>
+                
+                <!-- Search Box -->
+                <div class="relative">
+                    <input type="text" id="searchTree1" placeholder="Search nodes..." 
+                        class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 hidden">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Search Results Counter -->
+                <div id="searchResults" class="mt-2 text-xs text-gray-500 hidden"></div>
+            </div>
+            
+            <div id="tree1" class="overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft">
+                <div class="tree-container mt-2"></div>
             </div>
         </div>
 
+        <!-- Tree 2 -->
         <div id="tree2"
             class="bg-white rounded-2xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight border border-gray-200">
             <h3 class="font-bold text-indigo-900 text-lg mb-3 border-b border-gray-100 pb-2">Target</h3>
-            <div class="tree-container mt-2">
-                <!-- Nodes θα γεμίσουν με JS -->
-            </div>
+            <div class="tree-container mt-2"></div>
         </div>
     </div>
-
 
     <div id="node-info" class="hidden bg-white p-4 rounded shadow max-w-s max-h-64 overflow-y-auto">
         <h2 id="node-title" class="text-lg font-semibold mb-2"></h2>
@@ -59,16 +113,75 @@
                     hover:from-green-600 hover:to-green-800 transform transition-all duration-300 hover:scale-105">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
-            Find Suggestions
+            <span id="btnText">Select Matching Model</span>
         </button>
 
-        <!-- Progress Bar -->
-        <div id="suggestionsStatus" class="w-full bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-inner">
-            <div class="w-full bg-gray-300 rounded-full h-4 overflow-hidden shadow-inner">
-                <div id="suggestionsProgress" class="bg-green-400 h-4 w-0 transition-all duration-500 rounded-full">
+        <!-- Model Selector (Hidden by default) -->
+        <div id="modelSelector" class="model-selector overflow-y-auto w-full bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border-2 border-indigo-200">
+            <h4 class="text-lg font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                Choose Matching Algorithm
+            </h4>
+            
+            <div class="space-y-3">
+                <!-- String-based Model -->
+                <div class="model-option">
+                    <input type="radio" id="modelString" name="matchingModel" value="string" class="hidden peer">
+                    <label for="modelString" class="flex items-start gap-3 p-4 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-600 flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="currentColor" viewBox="0 0 12 12">
+                                    <path d="M10 3L4.5 8.5 2 6"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">String-Based Matching</div>
+                            <div class="text-sm text-gray-600 mt-1">Fast fuzzy matching using Dice coefficient and token comparison. Best for exact or near-exact label matches.</div>
+                            <div class="flex gap-2 mt-2">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Fast</span>
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">No dependencies</span>
+                            </div>
+                        </div>
+                    </label>
                 </div>
+
+                <!-- Embeddings Model -->
+                <div class="model-option">
+                    <input type="radio" id="modelEmbeddings" name="matchingModel" value="embeddings" class="hidden peer">
+                    <label for="modelEmbeddings" class="flex items-start gap-3 p-4 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-600 flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="currentColor" viewBox="0 0 12 12">
+                                    <path d="M10 3L4.5 8.5 2 6"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">Semantic Embeddings (AI)</div>
+                            <div class="text-sm text-gray-600 mt-1">Advanced AI-powered matching using transformer models. Understands meaning and context, works across different phrasings.</div>
+                            <div class="flex gap-2 mt-2">
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">AI-Powered</span>
+                                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Higher accuracy</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button id="confirmModel" class="mt-4 w-full px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
+                Generate Suggestions
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="suggestionsStatus" class="w-full bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-inner hidden">
+            <div class="w-full bg-gray-300 rounded-full h-4 overflow-hidden shadow-inner">
+                <div id="suggestionsProgress" class="bg-green-400 h-4 w-0 transition-all duration-500 rounded-full"></div>
             </div>
             <div class="text-center mt-2">
                 <span id="suggestionsCount" class="text-sm text-gray-900 font-semibold"></span>
@@ -112,7 +225,6 @@
 
         <div id="suggestions-list" class="space-y-3"></div>
     </div>
-
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto my-10">
 
@@ -189,7 +301,8 @@
                     Export Ontology
                 </button>
             </div>
-</div>
+        </div>
+    </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
@@ -199,7 +312,161 @@
 
         const token = localStorage.getItem("token");
         let selectedNode = null;
+        let selectedSuggestion = null;
+        let selectedNodeData = null;
+        let allNodesTree1 = [];
 
+        // ========== SEARCH FUNCTIONALITY ==========
+        const searchInput = document.getElementById('searchTree1');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim().toLowerCase();
+            
+            if (query.length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+                performSearch(query);
+            } else {
+                clearSearchBtn.classList.add('hidden');
+                clearSearch();
+            }
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            clearSearch();
+        });
+
+        function collectAllNodes(nodeData, parentPath = []) {
+            const nodes = [];
+            const currentPath = [...parentPath, nodeData.name];
+            
+            nodes.push({
+                ...nodeData,
+                path: currentPath
+            });
+            
+            if (nodeData.children && nodeData.children.length > 0) {
+                nodeData.children.forEach(child => {
+                    nodes.push(...collectAllNodes(child, currentPath));
+                });
+            }
+            
+            return nodes;
+        }
+
+        function performSearch(query) {
+            // Clear previous highlights
+            document.querySelectorAll('.search-highlight').forEach(el => {
+                el.classList.remove('search-highlight');
+            });
+
+            const matches = allNodesTree1.filter(node => 
+                node.name.toLowerCase().includes(query)
+            );
+
+            if (matches.length > 0) {
+                searchResults.textContent = `Found ${matches.length} match${matches.length > 1 ? 'es' : ''}`;
+                searchResults.classList.remove('hidden');
+
+                // Highlight and scroll to first match
+                const firstMatch = matches[0];
+                highlightAndScrollToNode(firstMatch);
+            } else {
+                searchResults.textContent = 'No matches found';
+                searchResults.classList.remove('hidden');
+            }
+        }
+
+        function highlightAndScrollToNode(nodeData) {
+            const tree1Container = document.querySelector('#tree1 .tree-container');
+            const allCards = tree1Container.querySelectorAll('.node-card');
+            
+            allCards.forEach(card => {
+                if (card.textContent.trim().includes(nodeData.name)) {
+                    // Expand all parents
+                    let parent = card.closest('.node-children');
+                    while (parent) {
+                        parent.style.display = 'block';
+                        const arrow = parent.previousElementSibling?.querySelector('.arrow');
+                        if (arrow) arrow.classList.remove('arrow-collapsed');
+                        parent = parent.parentElement.closest('.node-children');
+                    }
+                    
+                    // Highlight
+                    card.classList.add('search-highlight');
+                    
+                    // Scroll into view
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Auto-select
+                    setTimeout(() => {
+                        card.click();
+                    }, 500);
+                }
+            });
+        }
+
+        function clearSearch() {
+            searchResults.classList.add('hidden');
+            document.querySelectorAll('.search-highlight').forEach(el => {
+                el.classList.remove('search-highlight');
+            });
+        }
+
+        // ========== MODEL SELECTION ==========
+        const generateBtn = document.getElementById("generateSuggestionsBtn");
+        const modelSelector = document.getElementById("modelSelector");
+        const confirmModelBtn = document.getElementById("confirmModel");
+        const btnText = document.getElementById("btnText");
+
+        let modelSelectorExpanded = false;
+
+        generateBtn.addEventListener("click", () => {
+            if (!selectedNodeData) {
+                alert("Please select a node first!");
+                return;
+            }
+
+            modelSelectorExpanded = !modelSelectorExpanded;
+            
+            if (modelSelectorExpanded) {
+                modelSelector.classList.add('expanded');
+                btnText.textContent = "Close Model Selection";
+                generateBtn.querySelector('svg').style.transform = 'rotate(180deg)';
+            } else {
+                modelSelector.classList.remove('expanded');
+                btnText.textContent = "Select Matching Model";
+                generateBtn.querySelector('svg').style.transform = 'rotate(0deg)';
+            }
+        });
+
+        confirmModelBtn.addEventListener("click", async () => {
+            const selectedModel = document.querySelector('input[name="matchingModel"]:checked');
+            
+            if (!selectedModel) {
+                alert("Please select a matching model!");
+                return;
+            }
+
+            const modelType = selectedModel.value;
+            
+            // Close the selector
+            modelSelector.classList.remove('expanded');
+            modelSelectorExpanded = false;
+            btnText.textContent = "Select Matching Model";
+            generateBtn.querySelector('svg').style.transform = 'rotate(0deg)';
+            
+            // Show progress bar
+            document.getElementById('suggestionsStatus').classList.remove('hidden');
+            
+            // Call appropriate API
+            await showNodeSuggestions(selectedNodeData, modelType);
+        });
+
+        // ========== MAIN FUNCTIONS ==========
         async function loadProjectFiles() {
             if (!token) { alert("No token found. Please log in."); return; }
 
@@ -211,11 +478,26 @@
 
                 const files = await res.json();
 
-                if (files[0] && files[0].tree) renderTree(files[0].tree, "#tree1");
-                else document.querySelector("#tree1").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
+                if (files[0] && files[0].tree) {
+                    // Collect all nodes for search
+                    if (Array.isArray(files[0].tree)) {
+                        files[0].tree.forEach(root => {
+                            allNodesTree1.push(...collectAllNodes(root));
+                        });
+                    } else {
+                        allNodesTree1 = collectAllNodes(files[0].tree);
+                    }
+                    
+                    renderTree(files[0].tree, "#tree1");
+                } else {
+                    document.querySelector("#tree1 .tree-container").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
+                }
 
-                if (files[1] && files[1].tree) renderTree(files[1].tree, "#tree2");
-                else document.querySelector("#tree2").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
+                if (files[1] && files[1].tree) {
+                    renderTree(files[1].tree, "#tree2");
+                } else {
+                    document.querySelector("#tree2 .tree-container").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
+                }
 
             } catch (err) {
                 console.error(err);
@@ -282,16 +564,18 @@
             }
         }
 
-        let selectedSuggestion = null;
-
-        async function showNodeSuggestions(nodeData) {
+        async function showNodeSuggestions(nodeData, modelType) {
             const suggestionsDiv = document.getElementById("node-suggestions");
             const suggestionsList = document.getElementById("suggestions-list");
             suggestionsList.innerHTML = "<p class='text-gray-500 text-center py-4'>Loading suggestions...</p>";
             suggestionsDiv.classList.remove("hidden");
 
+            // Determine which API endpoint to use
+            const endpoint = modelType === 'embeddings' ? 'suggestions_semantic' : 'suggestions_full';
+            const apiUrl = `${window.apiBaseUrl}/projects/${projectId}/${endpoint}?node_uri=${encodeURIComponent(nodeData.uri)}`;
+
             try {
-                const res = await fetch(`${window.apiBaseUrl}/projects/${projectId}/suggestions_full?node_uri=${encodeURIComponent(nodeData.uri)}`, {
+                const res = await fetch(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
@@ -299,11 +583,9 @@
                 suggestionsList.innerHTML = "";
 
                 if (data.suggestions.length > 0) {
-                    // Separate exact matches from others
                     const exactMatches = data.suggestions.filter(s => s.is_exact_match);
                     const otherMatches = data.suggestions.filter(s => !s.is_exact_match);
 
-                    // Show exact matches first
                     if (exactMatches.length > 0) {
                         const exactHeader = document.createElement("div");
                         exactHeader.className = "mb-3 pb-2 border-b-2 border-green-500";
@@ -316,13 +598,11 @@
                     </span>
                 `;
                         suggestionsList.appendChild(exactHeader);
-
                         exactMatches.forEach(s => {
                             suggestionsList.appendChild(createSuggestionCard(s, true));
                         });
                     }
 
-                    // Show other matches
                     if (otherMatches.length > 0) {
                         const otherHeader = document.createElement("div");
                         otherHeader.className = "mt-6 mb-3 pb-2 border-b-2 border-blue-300";
@@ -332,7 +612,6 @@
                     </span>
                 `;
                         suggestionsList.appendChild(otherHeader);
-
                         otherMatches.forEach(s => {
                             suggestionsList.appendChild(createSuggestionCard(s, false));
                         });
@@ -351,10 +630,9 @@
             `;
                 }
 
-                // Update progress bar
                 let maxSim = data.suggestions.length > 0 ? Math.max(...data.suggestions.map(s => s.similarity)) : 0;
                 document.getElementById("suggestionsProgress").style.width = (maxSim * 100) + "%";
-                document.getElementById("suggestionsCount").textContent = `Best match: ${(maxSim * 100).toFixed(0)}%`;
+                document.getElementById("suggestionsCount").textContent = `Best match: ${(maxSim * 100).toFixed(0)}% | Model: ${modelType === 'embeddings' ? 'AI Embeddings' : 'String-Based'}`;
 
             } catch (err) {
                 suggestionsList.innerHTML = `
@@ -379,7 +657,6 @@
             const scoreClass = getScoreClass(similarity);
             const scoreBarClass = getScoreBarClass(similarity);
 
-            // Get the scores object with defaults
             const scores = suggestion.scores || {
                 label: suggestion.similarity,
                 definition: 0,
@@ -409,12 +686,10 @@
                     </div>
                 ` : ''}
                 
-                <!-- Score bar -->
                 <div class="score-bar-container mb-3">
                     <div class="score-bar ${scoreBarClass}" style="width: ${similarity}%"></div>
                 </div>
                 
-                <!-- Main score and expand button -->
                 <div class="flex items-center justify-between">
                     <span class="score-pill ${scoreClass}">${similarity.toFixed(1)}% Match</span>
                     
@@ -426,7 +701,6 @@
                     </button>
                 </div>
                 
-                <!-- Expandable details -->
                 <div class="score-details hidden mt-3 pt-3 border-t border-gray-200">
                     <div class="text-xs text-gray-600 mb-2 font-medium">Score Breakdown:</div>
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -446,14 +720,12 @@
 
             card.addEventListener("click", (e) => {
                 if (e.target.closest('.expand-btn')) return;
-
                 document.querySelectorAll(".suggestion-card").forEach(el => el.classList.remove("selected"));
                 card.classList.add("selected");
                 selectedSuggestion = suggestion;
                 console.log("Selected suggestion:", selectedSuggestion);
             });
 
-            // Expand/collapse details
             const expandBtn = card.querySelector('.expand-btn');
             const details = card.querySelector('.score-details');
             const expandIcon = card.querySelector('.expand-icon');
@@ -470,7 +742,6 @@
         function createScoreDetail(label, score, emoji) {
             const percentage = score.toFixed(0);
             const color = score >= 70 ? 'text-green-600' : score >= 40 ? 'text-blue-600' : 'text-gray-400';
-
             return `
         <div class="text-center p-2 bg-gray-50 rounded">
             <div class="text-lg">${emoji}</div>
@@ -494,14 +765,11 @@
             return 'score-bar-weak';
         }
 
-        let selectedNodeData = null;
-
         function renderTree(data, selector) {
-            const container = d3.select(selector);
+            const container = d3.select(selector + ' .tree-container');
             container.html("");
 
             function createNode(nodeData, parentDiv) {
-                // Δημιουργία node
                 const nodeDiv = parentDiv.append("div").attr("class", "node-wrapper");
                 const card = nodeDiv.append("div")
                     .attr("class", "node-card flex items-center")
@@ -509,19 +777,17 @@
 
                 let childrenDiv;
                 if (nodeData.children && nodeData.children.length > 0) {
-                    
                     card.html(`<svg class="arrow mr-2" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="M9 6l6 6-6 6"/>
                             </svg>${nodeData.name}`);
 
                     childrenDiv = nodeDiv.append("div")
                         .attr("class", "node-children")
-                        .style("display", "none"); 
+                        .style("display", "none");
 
                     nodeData.children.forEach(child => createNode(child, childrenDiv));
                 }
 
-                
                 card.on("click", (event) => {
                     event.stopPropagation();
                     showNodeInfo(nodeData);
@@ -546,25 +812,13 @@
             }
         }
 
-
         loadProjectFiles();
-
-        // Generate Suggestions Button
-        const generateBtn = document.getElementById("generateSuggestionsBtn");
-        generateBtn.addEventListener("click", async () => {
-            if (!selectedNodeData) {
-                alert("Please select a node first!");
-                return;
-            }
-            await showNodeSuggestions(selectedNodeData);
-        });
 
         const groupSelect = document.getElementById("linkCategory");
         const linkTypeSelect = document.getElementById("linkTypeSelect");
 
         groupSelect.addEventListener("change", async () => {
             const group = groupSelect.value;
-
             linkTypeSelect.innerHTML = `<option value="">-- Select Type --</option>`;
 
             if (!group) return;
@@ -576,7 +830,6 @@
                 if (!res.ok) throw new Error("Failed to load link types");
 
                 const data = await res.json();
-
                 data.forEach(item => {
                     const option = document.createElement("option");
                     option.value = item.id;
@@ -590,65 +843,58 @@
             }
         });
 
-
         const linkBtn = document.getElementById("createLinkBtn");
+        linkBtn.addEventListener("click", async () => {
+            if (!selectedSuggestion) {
+                alert("Please pick a suggestion first!");
+                return;
+            }
+            if (!selectedNodeData) {
+                alert("Please select a source node first!");
+                return;
+            }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            linkBtn.addEventListener("click", async () => {
-                if (!selectedSuggestion) {
-                    alert("Please pick a suggestion first!");
-                    return;
+            const category = document.getElementById("linkCategory").value;
+            const type = document.getElementById("linkTypeSelect").value;
+
+            if (!category || !type) {
+                alert("Please select both category and type");
+                return;
+            }
+
+            try {
+                const payload = {
+                    project_id: parseInt(projectId),
+                    source_node: selectedNodeData.uri,
+                    target_node: selectedSuggestion.node2,
+                    link_type_id: parseInt(linkTypeSelect.value),
+                    suggestion_score: selectedSuggestion.similarity * 100
+                };
+
+                console.log("Link payload:", payload);
+
+                const res = await fetch(`${window.apiBaseUrl}/links/`, {
+                    method: "POST",
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || "Failed to create link");
                 }
-                if (!selectedNodeData) {
-                    alert("Please select a source node first!");
-                    return;
-                }
 
-                const category = document.getElementById("linkCategory").value;
-                const type = document.getElementById("linkTypeSelect").value;
+                const data = await res.json();
+                alert("Link created successfully!");
+                console.log(data);
 
-                if (!category || !type) {
-                    alert("Please select both category and type");
-                    return;
-                }
-
-                const link_type_id = parseInt(type);
-
-                try {
-                    const payload = {
-                        project_id: parseInt(projectId),
-                        source_node: selectedNodeData.uri,
-                        target_node: selectedSuggestion.node2,
-                        link_type_id: parseInt(linkTypeSelect.value),
-                        suggestion_score: selectedSuggestion.similarity * 100
-                    };
-
-                    console.log("Link payload:", payload);
-
-                    const res = await fetch(`${window.apiBaseUrl}/links/`, {
-                        method: "POST",
-                        headers: {
-                            'Authorization': 'Bearer ' + token,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-
-                    if (!res.ok) {
-                        const errorData = await res.json();
-                        throw new Error(errorData.detail || "Failed to create link");
-                    }
-
-                    const data = await res.json();
-                    alert("Link created successfully!");
-                    console.log(data);
-
-                } catch (err) {
-                    console.error(err);
-                    alert("Error: " + err.message);
-                }
-            });
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+            }
         });
 
         const exportBtn = document.getElementById('exportLinksBtn');
@@ -661,7 +907,6 @@
                 if (!res.ok) throw new Error("Failed to export links");
 
                 const data = await res.json();
-
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -676,8 +921,6 @@
                 alert("Error exporting links: " + err.message);
             }
         });
-
-
     </script>
 
 </body>

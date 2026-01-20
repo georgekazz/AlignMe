@@ -680,8 +680,10 @@
     </div>
     <!-- Footer -->
     <footer class="mt-auto mb-4 text-pink-500 text-sm animate__animated animate__fadeInUp text-center">
-        &copy; 2025 AlignMe. All rights reserved.
+        &copy; <span id="current-year"></span> Alignment. All rights reserved.
     </footer>
 </body>
-
+    <script>
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
 </html>
