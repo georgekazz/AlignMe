@@ -16,9 +16,10 @@ RUN a2enmod rewrite
 # Εγκατάσταση PHP extensions
 RUN docker-php-ext-install pdo_mysql zip
 
-# Εγκατάσταση Node.js και npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
+# Εγκατάσταση Node.js και npm (Node 20 LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ρύθμιση DocumentRoot του Apache για Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -37,14 +38,19 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Ορισμός περιβάλλοντος για τον Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Εγκατάσταση των npm εξαρτήσεων
+# Αντιγραφή .env πριν το build (απαραίτητο για το Vite)
+RUN cp .env.example .env
+
+# Εγκατάσταση npm εξαρτήσεων και build
 RUN npm install && npm run build
 
+# Εγκατάσταση Composer εξαρτήσεων
 RUN composer install --no-dev --optimize-autoloader
-# Αντιγραφή .env και δημιουργία κλειδιού Laravel
-RUN cp .env.example .env
+
+# Δημιουργία Laravel key
 RUN php artisan key:generate
 
+# Δημιουργία log file
 RUN mkdir -p /var/www/html/storage/logs && touch /var/www/html/storage/logs/laravel.log
 
 # Ορισμός σωστών δικαιωμάτων σε storage & bootstrap/cache
