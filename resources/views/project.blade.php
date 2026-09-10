@@ -5,924 +5,731 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project - AlignMe</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="../img/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/project.css">
-    <style>
-        .search-highlight {
-            background-color: #fef08a !important;
-            animation: pulse 1s ease-in-out 2;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .model-selector {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-        }
-
-        .model-selector.expanded {
-            max-height: 300px;
-            padding: 1.5rem;
-        }
-
-        .model-option {
-            transition: all 0.2s ease;
-        }
-
-        .model-option:hover {
-            transform: translateX(4px);
-        }
-
-        .model-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-    </style>
 </head>
 
-<body class="hero-bg min-h-screen p-6">
+<body class="hero-bg min-h-screen">
 
-    <!-- Back Button -->
-    <div class="mb-8">
-        <button onclick="window.history.back()"
-            class="group inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-            <span class="font-semibold">Back to Dashboard</span>
-        </button>
-    </div>
-    
-    <!-- Trees Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Tree 1 with Search -->
-        <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-200">
-            <div class="mb-3 border-b border-gray-100 pb-3">
-                <h3 class="font-bold text-indigo-900 text-lg mb-2">Source</h3>
-                
-                <!-- Search Box -->
-                <div class="relative">
-                    <input type="text" id="searchTree1" placeholder="Search nodes..." 
-                        class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
-                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 hidden">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Search Results Counter -->
-                <div id="searchResults" class="mt-2 text-xs text-gray-500 hidden"></div>
-            </div>
-            
-            <div id="tree1" class="overflow-y-auto max-h-[450px] animate__animated animate__fadeInLeft">
-                <div class="tree-container mt-2"></div>
-            </div>
-        </div>
-
-        <!-- Tree 2 -->
-        <div id="tree2"
-            class="bg-white rounded-2xl shadow-lg p-4 overflow-y-auto max-h-[450px] animate__animated animate__fadeInRight border border-gray-200">
-            <h3 class="font-bold text-indigo-900 text-lg mb-3 border-b border-gray-100 pb-2">Target</h3>
-            <div class="tree-container mt-2"></div>
-        </div>
-    </div>
-
-    <div id="node-info" class="hidden bg-white p-4 rounded shadow max-w-s max-h-64 overflow-y-auto">
-        <h2 id="node-title" class="text-lg font-semibold mb-2"></h2>
-        <div id="node-details" class="text-sm text-gray-700"></div>
-    </div>
-
-    <!-- Suggestions Section -->
-    <div class="flex flex-col items-center gap-6 mb-8 max-w-3xl mx-auto">
-
-        <!-- Generate Suggestions Button -->
-        <button id="generateSuggestionsBtn" 
-                class="mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-full 
-                    bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow-lg
-                    hover:from-green-600 hover:to-green-800 transform transition-all duration-300 hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-            <span id="btnText">Select Matching Model</span>
-        </button>
-
-        <!-- Model Selector (Hidden by default) -->
-        <div id="modelSelector" class="model-selector overflow-y-auto w-full bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border-2 border-indigo-200">
-            <h4 class="text-lg font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+    <!-- Top bar -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-indigo-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+            <a href="/dashboard" class="btn btn-ghost"
+                onclick="if (history.length > 1) { history.back(); return false; }">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
-                Choose Matching Algorithm
-            </h4>
-            
-            <div class="space-y-3">
-                <!-- String-based Model -->
-                <div class="model-option">
-                    <input type="radio" id="modelString" name="matchingModel" value="string" class="hidden peer">
-                    <label for="modelString" class="flex items-start gap-3 p-4 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="currentColor" viewBox="0 0 12 12">
-                                    <path d="M10 3L4.5 8.5 2 6"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-800">String-Based Matching</div>
-                            <div class="text-sm text-gray-600 mt-1">Fast fuzzy matching using Dice coefficient and token comparison. Best for exact or near-exact label matches.</div>
-                            <div class="flex gap-2 mt-2">
-                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Fast</span>
-                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">No dependencies</span>
-                            </div>
-                        </div>
-                    </label>
-                </div>
+                <span class="hidden sm:inline">Dashboard</span>
+            </a>
+            <h1 id="projectName" class="font-bold text-indigo-900 text-lg truncate flex-1 min-w-0">Loading project…</h1>
 
-                <!-- Embeddings Model -->
-                <div class="model-option">
-                    <input type="radio" id="modelEmbeddings" name="matchingModel" value="embeddings" class="hidden peer">
-                    <label for="modelEmbeddings" class="flex items-start gap-3 p-4 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50">
-                        <div class="flex-shrink-0 mt-1">
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-400 peer-checked:border-indigo-600 peer-checked:bg-indigo-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="currentColor" viewBox="0 0 12 12">
-                                    <path d="M10 3L4.5 8.5 2 6"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-800">Semantic Embeddings (AI)</div>
-                            <div class="text-sm text-gray-600 mt-1">Advanced AI-powered matching using transformer models. Understands meaning and context, works across different phrasings.</div>
-                            <div class="flex gap-2 mt-2">
-                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">AI-Powered</span>
-                                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Higher accuracy</span>
-                            </div>
-                        </div>
-                    </label>
+            <div class="flex items-center gap-2">
+                <select id="exportFormat" class="input w-auto text-sm" title="Alignment export format">
+                    <option value="turtle">Turtle (.ttl)</option>
+                    <option value="xml">RDF/XML (.rdf)</option>
+                    <option value="nt">N-Triples (.nt)</option>
+                    <option value="json-ld">JSON-LD</option>
+                </select>
+                <button id="exportOntologyBtn" class="btn btn-secondary">Export alignment</button>
+                <button id="exportLinksBtn" class="btn btn-ghost" title="Download all links as JSON">Links JSON</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- Trees -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="panel tree-panel" data-tree="1">
+                <div class="panel-head">
+                    <div class="min-w-0">
+                        <h2 class="panel-title">File 1</h2>
+                        <p class="panel-sub truncate" data-filename>—</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="btn-icon" data-expand-all title="Expand all">＋</button>
+                        <button class="btn-icon" data-collapse-all title="Collapse all">－</button>
+                    </div>
+                </div>
+                <div class="search-row">
+                    <input type="search" placeholder="Search File 1 (Enter = next match)" class="input" data-search>
+                    <span class="search-count" data-search-count></span>
+                </div>
+                <div class="tree-scroll">
+                    <div class="tree-container" data-tree-container>
+                        <p class="muted">Loading…</p>
+                    </div>
                 </div>
             </div>
 
-            <button id="confirmModel" class="mt-4 w-full px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-lg hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
-                Generate Suggestions
-            </button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div id="suggestionsStatus" class="w-full bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-inner hidden">
-            <div class="w-full bg-gray-300 rounded-full h-4 overflow-hidden shadow-inner">
-                <div id="suggestionsProgress" class="bg-green-400 h-4 w-0 transition-all duration-500 rounded-full"></div>
-            </div>
-            <div class="text-center mt-2">
-                <span id="suggestionsCount" class="text-sm text-gray-900 font-semibold"></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Suggestions List -->
-    <div id="node-suggestions"
-         class="hidden bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 
-            w-full max-w-7xl mx-auto 
-            max-h-[100vh] overflow-y-auto
-            animate__animated animate__fadeInUp">
-
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
-                </svg>
-                Matching Suggestions
-            </h3>
-
-            <!-- Info tooltip -->
-            <div class="group relative">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 hover:text-indigo-600 cursor-help"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div
-                    class="hidden group-hover:block absolute right-0 top-6 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg z-10">
-                    <strong>Match Quality:</strong><br>
-                    • 90-100%: Excellent match<br>
-                    • 70-89%: Good match<br>
-                    • 50-69%: Moderate match<br>
-                    • Below 50%: Weak match
+            <div class="panel tree-panel" data-tree="2">
+                <div class="panel-head">
+                    <div class="min-w-0">
+                        <h2 class="panel-title">File 2</h2>
+                        <p class="panel-sub truncate" data-filename>—</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="btn-icon" data-expand-all title="Expand all">＋</button>
+                        <button class="btn-icon" data-collapse-all title="Collapse all">－</button>
+                    </div>
+                </div>
+                <div class="search-row">
+                    <input type="search" placeholder="Search File 2 (Enter = next match)" class="input" data-search>
+                    <span class="search-count" data-search-count></span>
+                </div>
+                <div class="tree-scroll">
+                    <div class="tree-container" data-tree-container>
+                        <p class="muted">Loading…</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="suggestions-list" class="space-y-3"></div>
-    </div>
+        <!-- Selected node + matching -->
+        <section id="matchPanel" class="panel">
+            <div class="flex flex-col md:flex-row md:items-start gap-4">
+                <div class="flex-1 min-w-0">
+                    <p class="panel-sub">Selected concept</p>
+                    <h2 id="node-title" class="text-xl font-bold text-indigo-900 truncate">Click a concept in either
+                        tree to start</h2>
+                    <p id="node-uri" class="text-xs text-gray-500 break-all mt-1"></p>
+                    <details id="node-info" class="mt-2 hidden">
+                        <summary class="text-sm text-indigo-700 cursor-pointer select-none">Show properties</summary>
+                        <div id="node-details" class="mt-2 text-sm space-y-1"></div>
+                    </details>
+                </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto my-10">
+                <form id="matchForm" class="w-full md:w-auto md:min-w-[320px] space-y-3" onsubmit="return false;">
+                    <div class="segmented" role="radiogroup" aria-label="Matching algorithm">
+                        <label><input type="radio" name="matchingModel" value="lexical"><span>Lexical</span></label>
+                        <label><input type="radio" name="matchingModel" value="semantic"><span>Semantic</span></label>
+                        <label><input type="radio" name="matchingModel" value="hybrid"
+                                checked><span>Hybrid</span></label>
+                    </div>
+                    <p id="modelHint" class="text-xs text-gray-500">Labels, definitions, meaning and hierarchy combined,
+                        with similarity propagation. Recommended.</p>
 
-    <!-- Create Link Section -->
-    <div
-        class="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 transform transition duration-500 hover:scale-[1.02] animate__animated animate__fadeInUp">
+                    <details class="text-sm">
+                        <summary class="cursor-pointer text-indigo-700 select-none">Options</summary>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <label class="field">Min. score <span id="thresholdValue">0.40</span>
+                                <input type="range" id="minThreshold" min="0.1" max="0.95" step="0.05" value="0.4"
+                                    class="w-full">
+                            </label>
+                            <label class="field">Max results
+                                <input type="number" id="topK" min="1" max="200" value="20" class="input">
+                            </label>
+                            <label class="field">Neighbour match <span id="structValue">0.60</span>
+                                <input type="range" id="structThreshold" min="0.3" max="0.9" step="0.05" value="0.6"
+                                    class="w-full">
+                            </label>
+                            <label class="field">Propagation rounds
+                                <input type="number" id="propagation" min="0" max="5" value="2" class="input">
+                            </label>
+                            <label class="col-span-2 flex items-center gap-2 text-sm" id="contextOption">
+                                <input type="checkbox" id="useContext"> Include parent/child labels (semantic only)
+                            </label>
+                        </div>
+                    </details>
 
-        <h3 class="text-2xl font-bold text-indigo-900 mb-6 text-center">Create Link</h3>
+                    <button id="generateSuggestionsBtn" class="btn btn-primary w-full" disabled>Find matches</button>
+                    <button id="alignAllBtn" class="btn btn-secondary w-full" type="button">Align whole project</button>
+                </form>
+            </div>
+        </section>
 
-        <div class="flex flex-col md:flex-row gap-4 mb-6">
-            <div class="flex-1 flex flex-col">
-                <label for="linkCategory" class="text-sm font-medium mb-1">Category</label>
-                <select id="linkCategory"
-                    class="p-3 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-gray-700">
-                    <option value="">-- Select Category --</option>
+        <!-- Suggestions -->
+        <section id="node-suggestions" class="panel hidden">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title">Matches</h2>
+                    <p id="suggestionsMeta" class="panel-sub"></p>
+                </div>
+                <div class="group relative">
+                    <button class="btn-icon" aria-label="How to read scores">?</button>
+                    <div class="tooltip hidden group-hover:block group-focus-within:block">
+                        90–100% excellent · 70–89% good · 50–69% moderate · below 50% weak.
+                        Open a card to see which signals (label, definition, hierarchy) contributed.
+                    </div>
+                </div>
+            </div>
+            <div id="suggestions-list" class="space-y-3"></div>
+        </section>
+
+        <!-- Create link -->
+        <section id="linkPanel" class="panel hidden">
+            <h2 class="panel-title mb-3">Create link</h2>
+            <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-center text-sm mb-4">
+                <div class="link-end"><span class="panel-sub">From</span><strong id="linkSource"
+                        class="truncate block"></strong></div>
+                <button id="swapDirection" class="btn-icon justify-self-center" title="Swap direction">⇄</button>
+                <div class="link-end"><span class="panel-sub">To</span><strong id="linkTarget"
+                        class="truncate block"></strong></div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <select id="linkCategory" class="input flex-1">
+                    <option value="">Category…</option>
                     <option value="SKOS">SKOS</option>
                     <option value="OWL">OWL</option>
                     <option value="RDFS">RDFS</option>
                 </select>
-            </div>
-
-            <div class="flex-1 flex flex-col">
-                <label for="linkTypeSelect" class="text-sm font-medium mb-1">Type</label>
-                <select id="linkTypeSelect"
-                    class="p-3 border rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-gray-700">
-                    <option value="">-- Select Type --</option>
+                <select id="linkTypeSelect" class="input flex-1" disabled>
+                    <option value="">Relation type…</option>
                 </select>
+                <button id="createLinkBtn" class="btn btn-primary" disabled>Create link</button>
             </div>
-        </div>
+        </section>
 
-        <div class="flex justify-center">
-            <button id="createLinkBtn" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg 
-                bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg 
-                hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-105">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
-                </svg>
-                Link Selected Suggestion
-            </button>
-        </div>
-    </div>
-
-    <!-- Export Section -->
-        <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 border-2 border-white/50 transform transition duration-300 hover:shadow-purple-500/20">
-            <h3 class="text-2xl font-bold text-indigo-900 mb-6 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export Options
-            </h3>
-
-            <div class="flex flex-col gap-4">
-                <button id="exportLinksBtn" 
-                    class="flex items-center justify-center gap-3 px-6 py-4 rounded-xl 
-                    bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-bold shadow-xl text-lg
-                    hover:from-indigo-600 hover:to-indigo-700 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M12 4v8" />
-                    </svg>
-                    Export Links
-                </button>
-
-                <button onclick="downloadOntology(projectId)" 
-                    class="flex items-center justify-center gap-3 px-6 py-4 rounded-xl 
-                    bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-xl text-lg
-                    hover:from-purple-600 hover:to-pink-600 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Export Ontology
-                </button>
+        <!-- Existing links -->
+        <section class="panel">
+            <div class="panel-head">
+                <h2 class="panel-title">Links in this project <span id="linksCount"
+                        class="panel-sub font-normal"></span></h2>
+                <button id="refreshLinks" class="btn-icon" title="Refresh">↻</button>
             </div>
-        </div>
-    </div>
+            <div id="links-list" class="space-y-2">
+                <p class="muted">Loading…</p>
+            </div>
+        </section>
+    </main>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <div id="toasts" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm"></div>
+
     <script>
         window.apiBaseUrl = "{{ config('api.base_url') }}";
-        const pathSegments = window.location.pathname.split('/');
-        const projectId = pathSegments[pathSegments.length - 1];
-
+        const projectId = window.location.pathname.split('/').filter(Boolean).pop();
         const token = localStorage.getItem("token");
-        let selectedNode = null;
-        let selectedSuggestion = null;
-        let selectedNodeData = null;
-        let allNodesTree1 = [];
+        if (!token) window.location.href = "/login";
 
-        // ========== SEARCH FUNCTIONALITY ==========
-        const searchInput = document.getElementById('searchTree1');
-        const clearSearchBtn = document.getElementById('clearSearch');
-        const searchResults = document.getElementById('searchResults');
+        const state = {
+            files: [null, null],          
+            selected: null,               
+            suggestion: null,            
+            swapped: false,              
+            linkTypes: [],
+        };
+        const trees = {};                 
 
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toLowerCase();
-            
-            if (query.length > 0) {
-                clearSearchBtn.classList.remove('hidden');
-                performSearch(query);
-            } else {
-                clearSearchBtn.classList.add('hidden');
-                clearSearch();
-            }
-        });
-
-        clearSearchBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            clearSearchBtn.classList.add('hidden');
-            clearSearch();
-        });
-
-        function collectAllNodes(nodeData, parentPath = []) {
-            const nodes = [];
-            const currentPath = [...parentPath, nodeData.name];
-            
-            nodes.push({
-                ...nodeData,
-                path: currentPath
+        async function api(path, options = {}) {
+            const res = await fetch(window.apiBaseUrl + path, {
+                ...options,
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(options.headers || {}) },
             });
-            
-            if (nodeData.children && nodeData.children.length > 0) {
-                nodeData.children.forEach(child => {
-                    nodes.push(...collectAllNodes(child, currentPath));
+            if (res.status === 401) { localStorage.removeItem("token"); window.location.href = "/login"; return; }
+            if (!res.ok) {
+                let msg = res.statusText;
+                try { msg = (await res.json()).detail || msg; } catch (_) { }
+                throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+            }
+            return res;
+        }
+        const getJSON = (p) => api(p).then(r => r.json());
+
+        function toast(message, kind = "info") {
+            const el = document.createElement("div");
+            el.className = `toast toast-${kind}`;
+            el.textContent = message;
+            document.getElementById("toasts").appendChild(el);
+            setTimeout(() => el.classList.add("show"), 10);
+            setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 300); }, 4000);
+        }
+        const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const pct = (x) => (Number(x || 0) * 100).toFixed(0);
+        const labelFor = (uri) => {
+            for (const t of Object.values(trees)) {
+                const hit = t.nodes.find(n => n.node.uri === uri);
+                if (hit) return hit.node.name;
+            }
+            return uri.split(/[#/]/).pop();
+        };
+        function download(blob, filename) {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+
+        function renderTree(treeIndex, data) {
+            const panel = document.querySelector(`.tree-panel[data-tree="${treeIndex}"]`);
+            const container = panel.querySelector('[data-tree-container]');
+            container.innerHTML = "";
+            const t = trees[treeIndex] = { container, nodes: [], search: { matches: [], cursor: -1 } };
+
+            function createNode(node, parentEl, depth) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "node-wrapper";
+                const card = document.createElement("div");
+                card.className = "node-card";
+                card.tabIndex = 0;
+                card.dataset.uri = node.uri;
+                const hasChildren = node.children && node.children.length > 0;
+                card.innerHTML = `${hasChildren ? '<svg class="arrow arrow-collapsed" viewBox="0 0 24 24"><path fill="currentColor" d="M9 6l6 6-6 6"/></svg>' : '<span class="leaf-dot"></span>'}<span class="node-name">${esc(node.name)}</span>${hasChildren ? `<span class="node-count">${node.children.length}</span>` : ''}`;
+                wrapper.appendChild(card);
+
+                let childrenEl = null;
+                if (hasChildren) {
+                    childrenEl = document.createElement("div");
+                    childrenEl.className = "node-children";
+                    childrenEl.hidden = depth > 0;         // root level open by default
+                    if (depth === 0) card.querySelector('.arrow').classList.remove('arrow-collapsed');
+                    node.children.forEach(c => createNode(c, childrenEl, depth + 1));
+                    wrapper.appendChild(childrenEl);
+                }
+                parentEl.appendChild(wrapper);
+                t.nodes.push({ node, el: card, childrenEl });
+
+                const toggle = () => {
+                    if (!childrenEl) return;
+                    childrenEl.hidden = !childrenEl.hidden;
+                    card.querySelector('.arrow').classList.toggle('arrow-collapsed', childrenEl.hidden);
+                };
+                card.addEventListener("click", (e) => {
+                    if (e.target.closest('.arrow')) { e.stopPropagation(); toggle(); return; }
+                    selectNode(node, treeIndex, card);
+                    if (childrenEl && childrenEl.hidden) toggle();
+                });
+                card.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); card.click(); }
+                    if (e.key === "ArrowRight" && childrenEl && childrenEl.hidden) toggle();
+                    if (e.key === "ArrowLeft" && childrenEl && !childrenEl.hidden) toggle();
                 });
             }
-            
-            return nodes;
+
+            (Array.isArray(data) ? data : [data]).forEach(n => createNode(n, container, 0));
+            if (!t.nodes.length) container.innerHTML = "<p class='muted'>No concepts with labels found in this file.</p>";
+
+            panel.querySelector('[data-expand-all]').onclick = () => setAll(treeIndex, false);
+            panel.querySelector('[data-collapse-all]').onclick = () => setAll(treeIndex, true);
+            const input = panel.querySelector('[data-search]');
+            const count = panel.querySelector('[data-search-count]');
+            input.oninput = () => runSearch(treeIndex, input.value, count);
+            input.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); nextMatch(treeIndex, count); } };
         }
 
-        function performSearch(query) {
-            // Clear previous highlights
-            document.querySelectorAll('.search-highlight').forEach(el => {
-                el.classList.remove('search-highlight');
+        function setAll(treeIndex, collapsed) {
+            trees[treeIndex].nodes.forEach(n => {
+                if (!n.childrenEl) return;
+                n.childrenEl.hidden = collapsed;
+                n.el.querySelector('.arrow').classList.toggle('arrow-collapsed', collapsed);
             });
+        }
 
-            const matches = allNodesTree1.filter(node => 
-                node.name.toLowerCase().includes(query)
-            );
+        function revealNode(cardEl) {
+            let parent = cardEl.closest('.node-children');
+            while (parent) {
+                parent.hidden = false;
+                parent.previousElementSibling?.querySelector('.arrow')?.classList.remove('arrow-collapsed');
+                parent = parent.parentElement.closest('.node-children');
+            }
+            cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
-            if (matches.length > 0) {
-                searchResults.textContent = `Found ${matches.length} match${matches.length > 1 ? 'es' : ''}`;
-                searchResults.classList.remove('hidden');
+        function runSearch(treeIndex, query, countEl) {
+            const t = trees[treeIndex];
+            const q = query.trim().toLowerCase();
+            t.nodes.forEach(n => n.el.classList.remove('search-hit', 'search-current'));
+            t.search = { matches: [], cursor: -1 };
+            if (!q) { countEl.textContent = ""; return; }
+            t.search.matches = t.nodes.filter(n => n.node.name.toLowerCase().includes(q) || n.node.uri.toLowerCase().includes(q));
+            t.search.matches.forEach(n => n.el.classList.add('search-hit'));
+            if (t.search.matches.length) nextMatch(treeIndex, countEl);
+            else countEl.textContent = "No matches";
+        }
 
-                // Highlight and scroll to first match
-                const firstMatch = matches[0];
-                highlightAndScrollToNode(firstMatch);
-            } else {
-                searchResults.textContent = 'No matches found';
-                searchResults.classList.remove('hidden');
+        function nextMatch(treeIndex, countEl) {
+            const s = trees[treeIndex].search;
+            if (!s.matches.length) return;
+            if (s.cursor >= 0) s.matches[s.cursor].el.classList.remove('search-current');
+            s.cursor = (s.cursor + 1) % s.matches.length;
+            const hit = s.matches[s.cursor];
+            hit.el.classList.add('search-current');
+            revealNode(hit.el);
+            countEl.textContent = `${s.cursor + 1} / ${s.matches.length}`;
+        }
+
+        async function selectNode(node, treeIndex, el) {
+            document.querySelectorAll('.node-card.selected').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            state.selected = { node, treeIndex, el };
+            state.suggestion = null;
+            state.swapped = false;
+
+            document.getElementById("node-title").textContent = node.name;
+            document.getElementById("node-uri").textContent = node.uri;
+            document.getElementById("generateSuggestionsBtn").disabled = false;
+            document.getElementById("generateSuggestionsBtn").textContent = `Find matches in File ${treeIndex === 1 ? 2 : 1}`;
+            document.getElementById("linkPanel").classList.add("hidden");
+            document.getElementById("node-suggestions").classList.add("hidden");
+            document.getElementById("matchPanel").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            const info = document.getElementById("node-info");
+            const details = document.getElementById("node-details");
+            info.classList.remove("hidden");
+            details.innerHTML = "<p class='muted'>Loading…</p>";
+            try {
+                const data = await getJSON(`/node-details/?project_id=${projectId}&uri=${encodeURIComponent(node.uri)}`);
+                details.innerHTML = Object.entries(data.details).map(([k, v]) =>
+                    `<div><span class="detail-key">${esc(k)}</span> ${(Array.isArray(v) ? v : [v]).map(x => `<span class="detail-value">${esc(x)}</span>`).join(' ')}</div>`
+                ).join("") || "<p class='muted'>No properties.</p>";
+            } catch (err) {
+                details.innerHTML = `<p class='text-red-600'>${esc(err.message)}</p>`;
             }
         }
 
-        function highlightAndScrollToNode(nodeData) {
-            const tree1Container = document.querySelector('#tree1 .tree-container');
-            const allCards = tree1Container.querySelectorAll('.node-card');
-            
-            allCards.forEach(card => {
-                if (card.textContent.trim().includes(nodeData.name)) {
-                    // Expand all parents
-                    let parent = card.closest('.node-children');
-                    while (parent) {
-                        parent.style.display = 'block';
-                        const arrow = parent.previousElementSibling?.querySelector('.arrow');
-                        if (arrow) arrow.classList.remove('arrow-collapsed');
-                        parent = parent.parentElement.closest('.node-children');
-                    }
-                    
-                    // Highlight
-                    card.classList.add('search-highlight');
-                    
-                    // Scroll into view
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Auto-select
-                    setTimeout(() => {
-                        card.click();
-                    }, 500);
-                }
+        const modelRadios = document.querySelectorAll('input[name="matchingModel"]');
+        const hints = {
+            lexical: "String similarity of labels (same language), notation codes, definitions and hierarchy. Works offline.",
+            semantic: "Multilingual language model compares meaning, plus hierarchy. Slower on the first run while the model loads.",
+            hybrid: "Labels, definitions, meaning and hierarchy combined, with similarity propagation. Recommended.",
+        };
+        modelRadios.forEach(r => r.addEventListener("change", () => {
+            document.getElementById("modelHint").textContent = hints[r.value];
+            document.getElementById("minThreshold").value = r.value === "lexical" ? 0.4 : 0.5;
+            document.getElementById("thresholdValue").textContent = Number(document.getElementById("minThreshold").value).toFixed(2);
+            document.getElementById("contextOption").classList.toggle("opacity-50", r.value === "lexical");
+        }));
+        document.getElementById("structThreshold").addEventListener("input", (e) => {
+            document.getElementById("structValue").textContent = Number(e.target.value).toFixed(2);
+        });
+        function matchParams() {
+            const model = document.querySelector('input[name="matchingModel"]:checked').value;
+            return new URLSearchParams({
+                method: model,
+                min_threshold: document.getElementById("minThreshold").value,
+                top_k: document.getElementById("topK").value || 20,
+                use_context: document.getElementById("useContext").checked,
+                structural_threshold: document.getElementById("structThreshold").value,
+                propagation_iterations: document.getElementById("propagation").value || 2,
             });
         }
+        document.getElementById("minThreshold").addEventListener("input", (e) => {
+            document.getElementById("thresholdValue").textContent = Number(e.target.value).toFixed(2);
+        });
 
-        function clearSearch() {
-            searchResults.classList.add('hidden');
-            document.querySelectorAll('.search-highlight').forEach(el => {
-                el.classList.remove('search-highlight');
-            });
-        }
+        document.getElementById("generateSuggestionsBtn").addEventListener("click", async () => {
+            if (!state.selected) return toast("Select a concept first", "warn");
+            const params = matchParams();
+            const model = params.get("method");
+            params.set("node_uri", state.selected.node.uri);
 
-        // ========== MODEL SELECTION ==========
-        const generateBtn = document.getElementById("generateSuggestionsBtn");
-        const modelSelector = document.getElementById("modelSelector");
-        const confirmModelBtn = document.getElementById("confirmModel");
-        const btnText = document.getElementById("btnText");
+            const btn = document.getElementById("generateSuggestionsBtn");
+            const section = document.getElementById("node-suggestions");
+            const list = document.getElementById("suggestions-list");
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Finding matches…';
+            section.classList.remove("hidden");
+            list.innerHTML = `<p class="muted">${model === "lexical" ? "Comparing labels…" : "Comparing meanings — the first run loads the language model and matches the whole project, later clicks are instant."}</p>`;
 
-        let modelSelectorExpanded = false;
+            try {
+                const data = await getJSON(`/projects/${projectId}/suggestions?${params}`);
+                renderSuggestions(data, model);
+            } catch (err) {
+                list.innerHTML = `<div class="empty"><p class="text-red-600 font-medium">Could not get matches</p><p class="muted">${esc(err.message)}</p></div>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = `Find matches in File ${state.selected.treeIndex === 1 ? 2 : 1}`;
+            }
+        });
 
-        generateBtn.addEventListener("click", () => {
-            if (!selectedNodeData) {
-                alert("Please select a node first!");
+        function renderSuggestions(data, model) {
+            const list = document.getElementById("suggestions-list");
+            const meta = document.getElementById("suggestionsMeta");
+            list.innerHTML = "";
+            state.suggestion = null;
+            const s = data.suggestions || [];
+            meta.textContent = `${data.total_matches} candidate${data.total_matches === 1 ? "" : "s"} · ${data.exact_matches} exact · ${model} matching · ${data.summary.concepts_file1} × ${data.summary.concepts_file2} concepts compared`;
+
+            if (!s.length) {
+                list.innerHTML = `<div class="empty"><p class="font-medium text-gray-700">No matches above ${pct(data.parameters?.min_threshold)}%</p><p class="muted">Lower the minimum score in Options, or try the other algorithm.</p></div>`;
                 return;
             }
-
-            modelSelectorExpanded = !modelSelectorExpanded;
-            
-            if (modelSelectorExpanded) {
-                modelSelector.classList.add('expanded');
-                btnText.textContent = "Close Model Selection";
-                generateBtn.querySelector('svg').style.transform = 'rotate(180deg)';
-            } else {
-                modelSelector.classList.remove('expanded');
-                btnText.textContent = "Select Matching Model";
-                generateBtn.querySelector('svg').style.transform = 'rotate(0deg)';
+            const exact = s.filter(x => x.is_exact_match), other = s.filter(x => !x.is_exact_match);
+            if (exact.length) {
+                list.insertAdjacentHTML("beforeend", `<p class="group-label text-green-700">Exact label matches (${exact.length})</p>`);
+                exact.forEach(x => list.appendChild(suggestionCard(x, true)));
             }
-        });
-
-        confirmModelBtn.addEventListener("click", async () => {
-            const selectedModel = document.querySelector('input[name="matchingModel"]:checked');
-            
-            if (!selectedModel) {
-                alert("Please select a matching model!");
-                return;
-            }
-
-            const modelType = selectedModel.value;
-            
-            // Close the selector
-            modelSelector.classList.remove('expanded');
-            modelSelectorExpanded = false;
-            btnText.textContent = "Select Matching Model";
-            generateBtn.querySelector('svg').style.transform = 'rotate(0deg)';
-            
-            // Show progress bar
-            document.getElementById('suggestionsStatus').classList.remove('hidden');
-            
-            // Call appropriate API
-            await showNodeSuggestions(selectedNodeData, modelType);
-        });
-
-        // ========== MAIN FUNCTIONS ==========
-        async function loadProjectFiles() {
-            if (!token) { alert("No token found. Please log in."); return; }
-
-            try {
-                const res = await fetch(`${window.apiBaseUrl}/project-files/${projectId}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (!res.ok) throw new Error("Failed to load project NT files");
-
-                const files = await res.json();
-
-                if (files[0] && files[0].tree) {
-                    // Collect all nodes for search
-                    if (Array.isArray(files[0].tree)) {
-                        files[0].tree.forEach(root => {
-                            allNodesTree1.push(...collectAllNodes(root));
-                        });
-                    } else {
-                        allNodesTree1 = collectAllNodes(files[0].tree);
-                    }
-                    
-                    renderTree(files[0].tree, "#tree1");
-                } else {
-                    document.querySelector("#tree1 .tree-container").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
-                }
-
-                if (files[1] && files[1].tree) {
-                    renderTree(files[1].tree, "#tree2");
-                } else {
-                    document.querySelector("#tree2 .tree-container").innerHTML = "<p class='text-red-600 font-bold'>No tree data</p>";
-                }
-
-            } catch (err) {
-                console.error(err);
-                alert("Error loading project files: " + err.message);
+            if (other.length) {
+                list.insertAdjacentHTML("beforeend", `<p class="group-label text-indigo-700 ${exact.length ? "mt-4" : ""}">Similar concepts (${other.length})</p>`);
+                other.forEach(x => list.appendChild(suggestionCard(x, false)));
             }
         }
 
-        function downloadOntology(projectId) {
-            const url = `${window.apiBaseUrl}/projects/${projectId}/export`;
+        function scoreClass(p) { return p >= 90 ? "excellent" : p >= 70 ? "good" : p >= 50 ? "moderate" : "weak"; }
 
-            fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("No ontology available for this project or not authenticated");
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `project_${projectId}_ontology.ttl`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch(err => {
-                alert(err.message);
-                console.error(err);
-            });
-        }
+        const SIGNAL_NAMES = {
+            jaro_winkler: "Spelling", token_set: "Words", dice: "Bigrams", notation: "Code",
+            label_embedding: "Label meaning", concept_embedding: "Concept meaning", definition_embedding: "Definition meaning",
+            definition_tfidf: "Definition words", parent: "Parents", child: "Children", sibling: "Siblings",
+            ancestor_path: "Ancestors", depth: "Depth", subtree: "Subtree", label: "Label", concept: "Meaning", definition: "Definition"
+        };
+        const REL_LABEL = { exactMatch: "exact match", closeMatch: "close match", broadMatch: "broader", narrowMatch: "narrower", relatedMatch: "related", uncertain: "uncertain" };
 
-        async function showNodeInfo(nodeData) {
-            const infoCard = document.getElementById("node-info");
-            const title = document.getElementById("node-title");
-            const detailsDiv = document.getElementById("node-details");
+        function suggestionCard(sug, isExact) {
+            const p = sug.similarity * 100;
+            const cls = scoreClass(p);
+            const breakdown = Object.entries(sug.scores || {})
+                .map(([k, v]) => `<div class="score-cell"><span>${SIGNAL_NAMES[k] || k}</span><strong class="${v >= 0.7 ? "text-green-600" : v >= 0.4 ? "text-indigo-600" : "text-gray-400"}">${pct(v)}%</strong></div>`).join("");
+            const rel = sug.suggested_relation;
+            const conflict = sug.better_source_for_target ? `<p class="text-xs text-amber-700 mt-1">⚠ Fits “${esc(labelFor(sug.better_source_for_target))}” better in the overall alignment.</p>` : "";
+            const inAlign = sug.in_global_alignment ? '<span class="badge badge-align">best 1:1 match</span>' : "";
 
-            title.textContent = nodeData.name;
-            detailsDiv.innerHTML = "<p class='text-gray-500'>Loading...</p>";
-
-            try {
-                const res = await fetch(`${window.apiBaseUrl}/node-details/?project_id=${projectId}&uri=${encodeURIComponent(nodeData.uri)}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await res.json();
-
-                detailsDiv.innerHTML = "";
-                for (const key in data.details) {
-                    const value = data.details[key];
-                    const div = document.createElement("div");
-                    div.innerHTML = `<span class="detail-key">${key} →</span> 
-                                     <span class="detail-value">${Array.isArray(value) ? value.join(", ") : value}</span>`;
-                    detailsDiv.appendChild(div);
-                }
-
-                infoCard.classList.remove("hidden");
-            } catch (err) {
-                detailsDiv.innerHTML = "<p class='text-red-600'>Error loading node details</p>";
-                console.error(err);
-            }
-        }
-
-        async function showNodeSuggestions(nodeData, modelType) {
-            const suggestionsDiv = document.getElementById("node-suggestions");
-            const suggestionsList = document.getElementById("suggestions-list");
-            suggestionsList.innerHTML = "<p class='text-gray-500 text-center py-4'>Loading suggestions...</p>";
-            suggestionsDiv.classList.remove("hidden");
-
-            // Determine which API endpoint to use
-            const endpoint = modelType === 'embeddings' ? 'suggestions_semantic' : 'suggestions_full';
-            const apiUrl = `${window.apiBaseUrl}/projects/${projectId}/${endpoint}?node_uri=${encodeURIComponent(nodeData.uri)}`;
-
-            try {
-                const res = await fetch(apiUrl, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await res.json();
-
-                suggestionsList.innerHTML = "";
-
-                if (data.suggestions.length > 0) {
-                    const exactMatches = data.suggestions.filter(s => s.is_exact_match);
-                    const otherMatches = data.suggestions.filter(s => !s.is_exact_match);
-
-                    if (exactMatches.length > 0) {
-                        const exactHeader = document.createElement("div");
-                        exactHeader.className = "mb-3 pb-2 border-b-2 border-green-500";
-                        exactHeader.innerHTML = `
-                    <span class="text-sm font-semibold text-green-700 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        Exact Matches (${exactMatches.length})
-                    </span>
-                `;
-                        suggestionsList.appendChild(exactHeader);
-                        exactMatches.forEach(s => {
-                            suggestionsList.appendChild(createSuggestionCard(s, true));
-                        });
-                    }
-
-                    if (otherMatches.length > 0) {
-                        const otherHeader = document.createElement("div");
-                        otherHeader.className = "mt-6 mb-3 pb-2 border-b-2 border-blue-300";
-                        otherHeader.innerHTML = `
-                    <span class="text-sm font-semibold text-blue-700">
-                        Similar Matches (${otherMatches.length})
-                    </span>
-                `;
-                        suggestionsList.appendChild(otherHeader);
-                        otherMatches.forEach(s => {
-                            suggestionsList.appendChild(createSuggestionCard(s, false));
-                        });
-                    }
-
-                } else {
-                    suggestionsList.innerHTML = `
-                <div class="text-center py-8">
-                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-gray-500 font-medium">No suggestions found</p>
-                    <p class="text-gray-400 text-sm mt-1">Try selecting a different node</p>
-                </div>
-            `;
-                }
-
-                let maxSim = data.suggestions.length > 0 ? Math.max(...data.suggestions.map(s => s.similarity)) : 0;
-                document.getElementById("suggestionsProgress").style.width = (maxSim * 100) + "%";
-                document.getElementById("suggestionsCount").textContent = `Best match: ${(maxSim * 100).toFixed(0)}% | Model: ${modelType === 'embeddings' ? 'AI Embeddings' : 'String-Based'}`;
-
-            } catch (err) {
-                suggestionsList.innerHTML = `
-            <div class="text-center py-8">
-                <svg class="w-12 h-12 mx-auto text-red-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-red-600 font-medium">Error loading suggestions</p>
-                <p class="text-gray-500 text-sm mt-1">${err.message}</p>
-            </div>
-        `;
-                console.error(err);
-            }
-        }
-
-        function createSuggestionCard(suggestion, isExact) {
             const card = document.createElement("div");
-            card.className = "suggestion-card bg-white rounded-lg p-4 cursor-pointer shadow-sm hover:shadow-md border border-gray-200";
-
-            const similarity = suggestion.similarity * 100;
-            const scoreClass = getScoreClass(similarity);
-            const scoreBarClass = getScoreBarClass(similarity);
-
-            const scores = suggestion.scores || {
-                label: suggestion.similarity,
-                definition: 0,
-                parent: 0,
-                child: 0,
-                sibling: 0
-            };
-
+            card.className = `suggestion-card score-${cls}`;
+            card.tabIndex = 0;
+            card.dataset.relation = rel;
             card.innerHTML = `
-        <div class="flex items-start justify-between gap-3">
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-2">
-                    ${isExact ? `
-                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            EXACT
-                        </span>
-                    ` : ''}
-                    <h4 class="font-semibold text-gray-800 truncate">${suggestion.label2}</h4>
-                </div>
-                
-                ${suggestion.all_labels && suggestion.all_labels.length > 1 ? `
-                    <div class="text-xs text-gray-500 mb-2">
-                        Also known as: ${suggestion.all_labels.slice(1).map(l => `<span class="detail-badge">${l}</span>`).join(' ')}
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            ${isExact ? '<span class="badge badge-exact">exact label</span>' : ""}
+                            ${rel && rel !== "uncertain" ? `<span class="badge badge-rel">${REL_LABEL[rel] || rel}</span>` : ""}
+                            ${inAlign}
+                            <h4 class="font-semibold text-gray-800 truncate">${esc(sug.label2)}</h4>
+                        </div>
+                        ${sug.all_labels?.length > 1 ? `<p class="text-xs text-gray-500 mt-1">Also: ${sug.all_labels.slice(1, 4).map(l => `<span class="detail-badge">${esc(l)}</span>`).join(" ")}</p>` : ""}
+                        ${sug.definition ? `<p class="text-xs text-gray-600 mt-1 line-clamp-2">${esc(sug.definition)}</p>` : ""}
+                        ${sug.reasons?.length ? `<p class="text-xs text-green-700 mt-1">✓ ${sug.reasons.map(esc).join(" · ")}</p>` : ""}
+                        ${conflict}
+                        <div class="score-bar-container mt-2"><div class="score-bar" style="width:${p}%"></div></div>
                     </div>
-                ` : ''}
-                
-                <div class="score-bar-container mb-3">
-                    <div class="score-bar ${scoreBarClass}" style="width: ${similarity}%"></div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <span class="score-pill ${scoreClass}">${similarity.toFixed(1)}% Match</span>
-                    
-                    <button class="expand-btn text-xs text-gray-500 hover:text-indigo-600 flex items-center gap-1">
-                        <span>Details</span>
-                        <svg class="expand-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="score-details hidden mt-3 pt-3 border-t border-gray-200">
-                    <div class="text-xs text-gray-600 mb-2 font-medium">Score Breakdown:</div>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        ${createScoreDetail('Label', scores.label * 100, '📝')}
-                        ${createScoreDetail('Definition', scores.definition * 100, '📄')}
-                        ${createScoreDetail('Parent', scores.parent * 100, '⬆️')}
-                        ${createScoreDetail('Child', scores.child * 100, '⬇️')}
-                        ${createScoreDetail('Sibling', scores.sibling * 100, '↔️')}
-                    </div>
-                    <div class="mt-2 text-xs text-gray-500">
-                        <strong>URI:</strong> <code class="bg-gray-100 px-1 rounded">${suggestion.node2}</code>
+                    <div class="text-right shrink-0">
+                        <div class="score-pill">${p.toFixed(0)}%</div>
+                        <button class="expand-btn" type="button">details</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    `;
+                <div class="score-details" hidden>
+                    <div class="score-grid">${breakdown}</div>
+                    ${sug.unavailable_signals?.length ? `<p class="text-xs text-gray-400 mt-2">Not available for this pair: ${sug.unavailable_signals.map(k => SIGNAL_NAMES[k] || k).join(", ")}</p>` : ""}
+                    <p class="text-xs text-gray-500 mt-2 break-all">${esc(sug.node2)}</p>
+                </div>`;
 
-            card.addEventListener("click", (e) => {
-                if (e.target.closest('.expand-btn')) return;
-                document.querySelectorAll(".suggestion-card").forEach(el => el.classList.remove("selected"));
-                card.classList.add("selected");
-                selectedSuggestion = suggestion;
-                console.log("Selected suggestion:", selectedSuggestion);
-            });
-
-            const expandBtn = card.querySelector('.expand-btn');
-            const details = card.querySelector('.score-details');
-            const expandIcon = card.querySelector('.expand-icon');
-
-            expandBtn.addEventListener("click", (e) => {
+            card.querySelector(".expand-btn").addEventListener("click", (e) => {
                 e.stopPropagation();
-                details.classList.toggle('hidden');
-                expandIcon.classList.toggle('expanded');
+                const d = card.querySelector(".score-details");
+                d.hidden = !d.hidden;
+                e.target.textContent = d.hidden ? "details" : "hide";
             });
-
+            const select = () => {
+                document.querySelectorAll(".suggestion-card.selected").forEach(el => el.classList.remove("selected"));
+                card.classList.add("selected");
+                state.suggestion = sug;
+                const otherIndex = state.selected.treeIndex === 1 ? 2 : 1;
+                const hit = trees[otherIndex]?.nodes.find(n => n.node.uri === sug.node2);
+                document.querySelectorAll('.node-card.target').forEach(c => c.classList.remove('target'));
+                if (hit) { hit.el.classList.add('target'); revealNode(hit.el); }
+                showLinkPanel();
+                preselectRelation(rel);
+            };
+            card.addEventListener("click", select);
+            card.addEventListener("keydown", (e) => { if (e.key === "Enter") select(); });
             return card;
         }
 
-        function createScoreDetail(label, score, emoji) {
-            const percentage = score.toFixed(0);
-            const color = score >= 70 ? 'text-green-600' : score >= 40 ? 'text-blue-600' : 'text-gray-400';
-            return `
-        <div class="text-center p-2 bg-gray-50 rounded">
-            <div class="text-lg">${emoji}</div>
-            <div class="text-xs font-medium text-gray-600">${label}</div>
-            <div class="text-sm font-bold ${color}">${percentage}%</div>
-        </div>
-    `;
-        }
-
-        function getScoreClass(score) {
-            if (score >= 90) return 'score-excellent';
-            if (score >= 70) return 'score-good';
-            if (score >= 50) return 'score-moderate';
-            return 'score-weak';
-        }
-
-        function getScoreBarClass(score) {
-            if (score >= 90) return 'score-bar-excellent';
-            if (score >= 70) return 'score-bar-good';
-            if (score >= 50) return 'score-bar-moderate';
-            return 'score-bar-weak';
-        }
-
-        function renderTree(data, selector) {
-            const container = d3.select(selector + ' .tree-container');
-            container.html("");
-
-            function createNode(nodeData, parentDiv) {
-                const nodeDiv = parentDiv.append("div").attr("class", "node-wrapper");
-                const card = nodeDiv.append("div")
-                    .attr("class", "node-card flex items-center")
-                    .text(nodeData.name);
-
-                let childrenDiv;
-                if (nodeData.children && nodeData.children.length > 0) {
-                    card.html(`<svg class="arrow mr-2" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M9 6l6 6-6 6"/>
-                            </svg>${nodeData.name}`);
-
-                    childrenDiv = nodeDiv.append("div")
-                        .attr("class", "node-children")
-                        .style("display", "none");
-
-                    nodeData.children.forEach(child => createNode(child, childrenDiv));
-                }
-
-                card.on("click", (event) => {
-                    event.stopPropagation();
-                    showNodeInfo(nodeData);
-
-                    if (selectedNode) selectedNode.classed("selected", false);
-                    card.classed("selected", true);
-                    selectedNode = card;
-                    selectedNodeData = nodeData;
-
-                    if (childrenDiv) {
-                        const visible = childrenDiv.style("display") === "block";
-                        childrenDiv.style("display", visible ? "none" : "block");
-                        card.select("svg.arrow").classed("arrow-collapsed", !visible);
-                    }
-                });
+        async function preselectRelation(rel) {
+            if (!rel || rel === "uncertain") return;
+            if (categorySelect.value !== "SKOS") {
+                categorySelect.value = "SKOS";
+                categorySelect.dispatchEvent(new Event("change"));
+                await new Promise(r => setTimeout(r, 300));
             }
-
-            if (Array.isArray(data)) {
-                data.forEach(node => createNode(node, container));
-            } else {
-                createNode(data, container);
-            }
+            const opt = [...typeSelect.options].find(o => (o.textContent + " " + o.dataset.inner).toLowerCase().includes(rel.toLowerCase()));
+            if (opt) { typeSelect.value = opt.value; updateCreateBtn(); }
         }
 
-        loadProjectFiles();
-
-        const groupSelect = document.getElementById("linkCategory");
-        const linkTypeSelect = document.getElementById("linkTypeSelect");
-
-        groupSelect.addEventListener("change", async () => {
-            const group = groupSelect.value;
-            linkTypeSelect.innerHTML = `<option value="">-- Select Type --</option>`;
-
-            if (!group) return;
-
+        document.getElementById("alignAllBtn").addEventListener("click", async () => {
+            const params = matchParams();
+            params.set("min_threshold", Math.max(0.6, Number(params.get("min_threshold"))));
+            const section = document.getElementById("node-suggestions");
+            const list = document.getElementById("suggestions-list");
+            const meta = document.getElementById("suggestionsMeta");
+            section.classList.remove("hidden");
+            list.innerHTML = `<p class="muted">Aligning every concept of File 1 with File 2…</p>`;
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
             try {
-                const res = await fetch(`${window.apiBaseUrl}/link-types?group=${group}`, {
-                    headers: { "Authorization": "Bearer " + token }
+                const data = await getJSON(`/projects/${projectId}/alignment?${params}`);
+                meta.textContent = `${data.count} one-to-one pairs above ${pct(data.min_threshold)}% · ` +
+                    Object.entries(data.by_relation).map(([k, v]) => `${v} ${REL_LABEL[k] || k}`).join(", ");
+                list.innerHTML = "";
+                if (!data.pairs.length) { list.innerHTML = `<div class="empty"><p class="muted">Nothing above the threshold. Lower the minimum score in Options.</p></div>`; return; }
+                const bar = document.createElement("div");
+                bar.className = "flex flex-wrap gap-2 items-center mb-3";
+                bar.innerHTML = `<button id="acceptExact" class="btn btn-primary">Create links for exact matches ≥ 90%</button>
+                                 <span class="muted">Links are created as SKOS relations; you can delete any of them below.</span>`;
+                list.appendChild(bar);
+                bar.querySelector("#acceptExact").addEventListener("click", async (e) => {
+                    e.target.disabled = true;
+                    try {
+                        const r = await api(`/projects/${projectId}/alignment/accept`, {
+                            method: "POST",
+                            body: JSON.stringify({ method: params.get("method"), min_threshold: 0.9, relations: ["exactMatch"] })
+                        }).then(r => r.json());
+                        toast(`Created ${r.created} links`, "success"); loadLinks();
+                    } catch (err) { toast(err.message, "error"); e.target.disabled = false; }
                 });
-                if (!res.ok) throw new Error("Failed to load link types");
-
-                const data = await res.json();
-                data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.id;
-                    option.textContent = item.value;
-                    linkTypeSelect.appendChild(option);
+                data.pairs.forEach(pair => {
+                    const row = document.createElement("div");
+                    row.className = `suggestion-card score-${scoreClass(pair.similarity * 100)} py-2`;
+                    row.innerHTML = `<div class="flex items-center gap-3 text-sm">
+                        <strong class="truncate" title="${esc(pair.node1)}">${esc(pair.label1)}</strong>
+                        <span class="badge badge-rel">${REL_LABEL[pair.suggested_relation] || pair.suggested_relation}</span>
+                        <strong class="truncate" title="${esc(pair.node2)}">${esc(pair.label2)}</strong>
+                        <span class="score-pill ml-auto">${pct(pair.similarity)}%</span></div>
+                        ${pair.reasons?.length ? `<p class="text-xs text-green-700 mt-1">✓ ${pair.reasons.map(esc).join(" · ")}</p>` : ""}`;
+                    row.addEventListener("click", () => {
+                        const hit = trees[1]?.nodes.find(n => n.node.uri === pair.node1);
+                        if (hit) { revealNode(hit.el); hit.el.click(); }
+                    });
+                    list.appendChild(row);
                 });
-
             } catch (err) {
-                console.error(err);
-                linkTypeSelect.innerHTML = `<option value="">Error loading types</option>`;
+                list.innerHTML = `<div class="empty"><p class="text-red-600 font-medium">Alignment failed</p><p class="muted">${esc(err.message)}</p></div>`;
             }
         });
 
-        const linkBtn = document.getElementById("createLinkBtn");
-        linkBtn.addEventListener("click", async () => {
-            if (!selectedSuggestion) {
-                alert("Please pick a suggestion first!");
-                return;
-            }
-            if (!selectedNodeData) {
-                alert("Please select a source node first!");
-                return;
-            }
+        // ---------- links ----------
+        function linkEnds() {
+            const a = { uri: state.selected.node.uri, name: state.selected.node.name };
+            const b = { uri: state.suggestion.node2, name: state.suggestion.label2 };
+            return state.swapped ? [b, a] : [a, b];
+        }
+        function showLinkPanel() {
+            const [from, to] = linkEnds();
+            document.getElementById("linkSource").textContent = from.name;
+            document.getElementById("linkSource").title = from.uri;
+            document.getElementById("linkTarget").textContent = to.name;
+            document.getElementById("linkTarget").title = to.uri;
+            document.getElementById("linkPanel").classList.remove("hidden");
+            updateCreateBtn();
+        }
+        document.getElementById("swapDirection").addEventListener("click", () => { state.swapped = !state.swapped; showLinkPanel(); });
 
-            const category = document.getElementById("linkCategory").value;
-            const type = document.getElementById("linkTypeSelect").value;
-
-            if (!category || !type) {
-                alert("Please select both category and type");
-                return;
-            }
-
+        const categorySelect = document.getElementById("linkCategory");
+        const typeSelect = document.getElementById("linkTypeSelect");
+        function updateCreateBtn() {
+            document.getElementById("createLinkBtn").disabled = !(state.suggestion && typeSelect.value);
+        }
+        categorySelect.addEventListener("change", async () => {
+            typeSelect.innerHTML = `<option value="">Relation type…</option>`;
+            typeSelect.disabled = true;
+            updateCreateBtn();
+            if (!categorySelect.value) return;
             try {
-                const payload = {
-                    project_id: parseInt(projectId),
-                    source_node: selectedNodeData.uri,
-                    target_node: selectedSuggestion.node2,
-                    link_type_id: parseInt(linkTypeSelect.value),
-                    suggestion_score: selectedSuggestion.similarity * 100
-                };
+                const types = await getJSON(`/link-types?group=${encodeURIComponent(categorySelect.value)}`);
+                if (!types.length) { typeSelect.innerHTML = `<option value="">No types in this category</option>`; return; }
+                types.forEach(t => {
+                    const o = document.createElement("option");
+                    o.value = t.id;
+                    o.textContent = t.value ?? t.name ?? t.label ?? t.inner;
+                    o.dataset.inner = t.inner || "";
+                    typeSelect.appendChild(o);
+                });
+                typeSelect.disabled = false;
+            } catch (err) { toast("Could not load relation types: " + err.message, "error"); }
+        });
+        typeSelect.addEventListener("change", updateCreateBtn);
 
-                console.log("Link payload:", payload);
-
-                const res = await fetch(`${window.apiBaseUrl}/links/`, {
+        document.getElementById("createLinkBtn").addEventListener("click", async () => {
+            if (!state.selected || !state.suggestion) return toast("Pick a concept and a match first", "warn");
+            if (!typeSelect.value) return toast("Choose a relation type", "warn");
+            const [from, to] = linkEnds();
+            const btn = document.getElementById("createLinkBtn");
+            btn.disabled = true;
+            try {
+                await api(`/links/`, {
                     method: "POST",
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        project_id: Number(projectId),
+                        source_node: from.uri,
+                        target_node: to.uri,
+                        link_type_id: Number(typeSelect.value),
+                        suggestion_score: Number((state.suggestion.similarity * 100).toFixed(1)),
+                    }),
                 });
-
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.detail || "Failed to create link");
-                }
-
-                const data = await res.json();
-                alert("Link created successfully!");
-                console.log(data);
-
-            } catch (err) {
-                console.error(err);
-                alert("Error: " + err.message);
-            }
+                toast(`Linked "${from.name}" → "${to.name}"`, "success");
+                loadLinks();
+            } catch (err) { toast("Could not create link: " + err.message, "error"); }
+            finally { btn.disabled = false; }
         });
 
-        const exportBtn = document.getElementById('exportLinksBtn');
-        exportBtn.addEventListener('click', async () => {
+        async function loadLinks() {
+            const list = document.getElementById("links-list");
             try {
-                const res = await fetch(`${window.apiBaseUrl}/projects/${projectId}/export-links`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                const links = await getJSON(`/projects/${projectId}/links`);
+                document.getElementById("linksCount").textContent = links.length ? `(${links.length})` : "";
+                if (!links.length) { list.innerHTML = `<div class="empty"><p class="muted">No links yet. Select a concept, find matches and create the first link.</p></div>`; return; }
+                list.innerHTML = "";
+                links.forEach(l => {
+                    const typeName = l.link_type?.value ?? l.link_type?.name ?? l.link_type?.label ?? l.link_type?.inner?.split(/[#/]/).pop() ?? `type #${l.link_type_id}`;
+                    const row = document.createElement("div");
+                    row.className = "link-row";
+                    row.innerHTML = `
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm truncate"><strong title="${esc(l.source_node)}">${esc(labelFor(l.source_node))}</strong>
+                                <span class="rel">${esc(typeName)}</span>
+                                <strong title="${esc(l.target_node)}">${esc(labelFor(l.target_node))}</strong></div>
+                            <div class="text-xs text-gray-500">${l.suggestion_score != null ? `score ${Number(l.suggestion_score).toFixed(0)}%` : "manual"}</div>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="vote-btn" data-vote="upvote" title="Agree">👍 <span>${l.upvote ?? 0}</span></button>
+                            <button class="vote-btn" data-vote="downvote" title="Disagree">👎 <span>${l.downvote ?? 0}</span></button>
+                            <button class="btn-icon text-red-500" data-delete title="Delete link">✕</button>
+                        </div>`;
+                    row.querySelectorAll("[data-vote]").forEach(b => b.addEventListener("click", async () => {
+                        try {
+                            const r = await api(`/links/${l.id}/vote`, { method: "POST", body: JSON.stringify({ type: b.dataset.vote }) }).then(r => r.json());
+                            row.querySelector('[data-vote="upvote"] span').textContent = r.upvote;
+                            row.querySelector('[data-vote="downvote"] span').textContent = r.downvote;
+                        } catch (err) { toast(err.message, "error"); }
+                    }));
+                    row.querySelector("[data-delete]").addEventListener("click", async () => {
+                        if (!confirm("Delete this link?")) return;
+                        try { await api(`/links/${l.id}`, { method: "DELETE" }); row.remove(); toast("Link deleted", "success"); loadLinks(); }
+                        catch (err) { toast(err.message, "error"); }
+                    });
+                    list.appendChild(row);
                 });
+            } catch (err) { list.innerHTML = `<p class="text-red-600 text-sm">${esc(err.message)}</p>`; }
+        }
+        document.getElementById("refreshLinks").addEventListener("click", loadLinks);
 
-                if (!res.ok) throw new Error("Failed to export links");
-
-                const data = await res.json();
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `project_${projectId}_links.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-
-                alert("Links exported successfully!");
-            } catch (err) {
-                console.error(err);
-                alert("Error exporting links: " + err.message);
-            }
+        document.getElementById("exportOntologyBtn").addEventListener("click", async () => {
+            const fmt = document.getElementById("exportFormat").value;
+            try {
+                const res = await api(`/projects/${projectId}/export?format=${fmt}`);
+                const ext = { turtle: "ttl", xml: "rdf", nt: "nt", "json-ld": "jsonld" }[fmt];
+                download(await res.blob(), `project_${projectId}_alignment.${ext}`);
+            } catch (err) { toast("Export failed: " + err.message, "error"); }
         });
-    </script>
+        document.getElementById("exportLinksBtn").addEventListener("click", async () => {
+            try {
+                const res = await api(`/projects/${projectId}/export-links`);
+                download(await res.blob(), `project_${projectId}_links.json`);
+            } catch (err) { toast("Export failed: " + err.message, "error"); }
+        });
 
+        async function init() {
+            try {
+                const [project, files] = await Promise.all([
+                    getJSON(`/projects/${projectId}`),
+                    getJSON(`/project-files/${projectId}`),
+                ]);
+                document.getElementById("projectName").textContent = project.name || `Project ${projectId}`;
+                document.title = `${project.name || "Project"} - AlignMe`;
+                files.forEach((f, i) => {
+                    state.files[i] = f;
+                    const panel = document.querySelector(`.tree-panel[data-tree="${i + 1}"]`);
+                    panel.querySelector('[data-filename]').textContent = `${f.original_filename} · ${f.triples_count} triples`;
+                    renderTree(i + 1, f.tree);
+                });
+            } catch (err) {
+                document.querySelectorAll('[data-tree-container]').forEach(c => c.innerHTML = `<p class="text-red-600 text-sm">${esc(err.message)}</p>`);
+                toast(err.message, "error");
+            }
+            loadLinks();
+        }
+        init();
+    </script>
 </body>
 
 </html>

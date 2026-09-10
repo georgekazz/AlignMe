@@ -4,318 +4,286 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AlignMe - My Files</title>
+    <title>AlignMe - Graph Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="icon" href="./img/favicon.png" type="image/x-icon">
-    <style>
-        .btn-loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="css/forcedirectree.css" />
 </head>
 
-<body class="bg-gradient-to-br from-indigo-500 via-purple-100 to-pink-800 font-sans min-h-screen p-6">
-    <div class="mb-6">
-        <button onclick="window.location.href='./dashboard'"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-            <span>Back to Home</span>
-        </button>
-    </div>
+<body class="bg-gradient-to-br from-indigo-500 via-purple-100 to-pink-800 font-sans min-h-screen p-3 sm:p-6">
 
-    <header class="text-center mb-12">
-        <h1 class="text-4xl font-extrabold text-indigo-900 drop-shadow-md">My Files</h1>
-        <p class="text-gray-600 mt-2">Explore your RDF graphs in style!</p>
-    </header>
-
-    <div id="filesContainer" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-
-    <div id="paginationControls" class="flex justify-center items-center gap-6 mt-8">
-        <button id="prevPage"
-            class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg hover:scale-105 transition disabled:opacity-40"
-            disabled>
-            <span class="hidden sm:inline">Previous</span>
-        </button>
-
-        <span id="pageInfo" class="text-gray-800 font-semibold text-lg px-4 py-1 bg-white rounded-xl shadow">Page
-            1</span>
-
-        <button id="nextPage"
-            class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 text-white shadow-lg hover:scale-105 transition">
-            <span class="hidden sm:inline">Next</span>
-        </button>
-    </div>
-
-    <section class="relative mt-12 max-w-7xl mx-auto">
-        <h2 class="text-2xl font-bold text-center text-purple-800 mb-4">Interactive Graph</h2>
-
-        <div id="graphContainer"
-            class="w-full h-[600px] bg-white/70 backdrop-blur border rounded-2xl shadow-xl relative overflow-hidden">
+    <div class="max-w-7xl mx-auto space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <a href="./dashboard" class="btn btn-ghost">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+                Back to Dashboard
+            </a>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900 drop-shadow-md">Graph Explorer</h1>
+            <span class="text-sm text-indigo-900/70 hidden sm:inline">Click a node to see its details · double-click to
+                expand its children · drag to move</span>
         </div>
 
-        <div id="nodeInfo"
-            class="absolute top-6 right-6 bg-white p-5 rounded-2xl shadow-2xl w-72 hidden transition-all duration-300 ease-in-out transform">
+        <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
+
+            <!-- Sidebar: files -->
+            <aside class="panel p-4 space-y-3 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+                <h2 class="font-bold text-indigo-900">Files</h2>
+                <input id="fileSearch" type="search" placeholder="Filter files…" class="input w-full">
+                <div id="filesContainer" class="space-y-2">
+                    <p class="text-sm text-gray-500">Loading…</p>
+                </div>
+            </aside>
+
+            <!-- Main: graph -->
+            <section class="space-y-3">
+                <div class="panel p-3 flex flex-wrap items-center gap-2">
+                    <select id="rootSelect" class="input flex-1 min-w-[180px]" disabled>
+                        <option value="">Start from top concepts</option>
+                    </select>
+                    <label class="text-sm text-gray-700 flex items-center gap-1">Depth <input id="depth" type="number"
+                            min="1" max="10" value="2" class="input w-16"></label>
+                    <label class="text-sm text-gray-700 flex items-center gap-1">Max nodes <input id="maxNodes"
+                            type="number" min="10" max="3000" step="50" value="300" class="input w-24"></label>
+                    <label class="text-sm text-gray-700 flex items-center gap-1"><input id="related" type="checkbox"
+                            checked class="accent-purple-600"> related / mappings</label>
+                    <button id="reload" class="btn btn-primary" disabled>Draw</button>
+                    <div class="ml-auto flex gap-2">
+                        <input id="nodeSearch" type="search" placeholder="Find node…" class="input w-40" disabled>
+                        <button id="fit" class="btn btn-ghost" title="Fit to screen" disabled>⤢</button>
+                        <button id="download" class="btn btn-ghost" title="Download SVG" disabled>⬇ SVG</button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div id="graphContainer"
+                        class="w-full bg-white/70 backdrop-blur border rounded-2xl shadow-xl overflow-hidden"
+                        style="height: min(70vh, 700px)">
+                        <div class="h-full flex items-center justify-center text-gray-500 text-sm p-6 text-center">
+                            Select a parsed file on the left to draw its graph.</div>
+                    </div>
+                    <div id="graphMeta"
+                        class="absolute left-3 bottom-3 text-xs bg-white/90 rounded-lg px-2 py-1 text-gray-600 hidden">
+                    </div>
+                    <div id="legend"
+                        class="absolute right-3 bottom-3 text-xs bg-white/90 rounded-lg px-2 py-1 text-gray-600 hidden">
+                        <span class="inline-block w-4 border-t-2 border-gray-400 align-middle"></span> broader &nbsp;
+                        <span class="inline-block w-4 border-t-2 border-dashed border-amber-500 align-middle"></span>
+                        related &nbsp;
+                        <span class="inline-block w-4 border-t-2 border-dotted border-emerald-500 align-middle"></span>
+                        mapping
+                    </div>
+                    <div id="nodeInfo"
+                        class="absolute top-3 right-3 panel p-4 w-80 max-w-[90%] max-h-[80%] overflow-y-auto hidden">
+                    </div>
+                </div>
+            </section>
         </div>
-    </section>
+        <footer class="text-indigo-100 text-sm text-center pt-4">&copy; <span id="year"></span> AlignMe</footer>
+    </div>
+
+    <div id="toasts" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm"></div>
 
     <script>
         window.apiBaseUrl = "{{ config('api.base_url') }}";
-        let currentPage = 1;
-        const itemsPerPage = 3;
-        let filesData = [];
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = './login';
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Δημιουργεί κάρτα αρχείου με κουμπί Convert και View
-        function createCard(file) {
-            const card = document.createElement('div');
-            card.className = "bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-between hover:scale-105 hover:shadow-2xl transition transform duration-300 ease-in-out";
-
-            const convertBtnId = `convert-btn-${file.id}`;
-            const viewBtnId = `view-btn-${file.id}`;
-
-            card.innerHTML = `
-    <div>
-      <h3 class="text-lg font-bold text-indigo-900 mb-2 flex items-center gap-2">📄 ${escapeHtml(file.filename || '')}</h3>
-      <p class="text-sm text-gray-600 mb-1"><span class="font-semibold">Type:</span> ${escapeHtml(file.filetype || '')}</p>
-      <p class="text-sm text-gray-600 mb-1"><span class="font-semibold">Status:</span> ${escapeHtml(file.status || '')}</p>
-      <p class="text-sm text-gray-600 mb-1"><span class="font-semibold">Public:</span> ${file.public ? '✅' : '❌'}</p>
-      <p class="text-xs text-gray-500 mt-2">🕒 ${file.created_at ? new Date(file.created_at).toLocaleString() : ''}</p>
-    </div>
-    <div class="mt-4 flex justify-between gap-3 items-center">
-      <div class="flex gap-2">
-        <button id="${convertBtnId}" class="px-3 py-2 rounded-xl font-semibold bg-yellow-500 text-white hover:bg-yellow-600 shadow transition" onclick="convertOnly(${file.id})">Convert</button>
-      </div>
-      <button id="${viewBtnId}" class="px-4 py-2 rounded-xl font-bold bg-purple-600 text-white hover:bg-purple-700 shadow transition" onclick="viewGraph(${file.id})">View Graph</button>
-    </div>
-  `;
-            return card;
+        // ---------- helpers ----------
+        const $ = (id) => document.getElementById(id);
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const shortName = (u) => String(u || '').split(/[#/]/).filter(Boolean).pop() || u;
+        async function api(path, options = {}) {
+            const res = await fetch(window.apiBaseUrl + path, { ...options, headers: { Authorization: 'Bearer ' + token, ...(options.headers || {}) } });
+            if (res.status === 401) { localStorage.removeItem('token'); window.location.href = './login'; return; }
+            if (!res.ok) { let m = res.statusText; try { m = (await res.json()).detail || m; } catch (_) { } throw new Error(typeof m === 'string' ? m : JSON.stringify(m)); }
+            return res.json();
+        }
+        function toast(msg, kind = 'info') {
+            const el = document.createElement('div'); el.className = `toast toast-${kind}`; el.textContent = msg;
+            $('toasts').appendChild(el); requestAnimationFrame(() => el.classList.add('show'));
+            setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 4000);
         }
 
-        // Escape HTML
-        function escapeHtml(str) {
-            return String(str).replace(/[&<>"'`]/g, function (s) {
-                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#x60;' })[s];
+        // ---------- files ----------
+        let files = [], activeFile = null;
+        async function loadFiles() {
+            try {
+                files = (await api('/my-files')).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                renderFiles();
+                const preset = new URLSearchParams(location.search).get('file');
+                if (preset) { const f = files.find(x => String(x.id) === preset); if (f) selectFile(f); }
+            } catch (err) { $('filesContainer').innerHTML = `<p class="text-sm text-red-600">${esc(err.message)}</p>`; }
+        }
+        function renderFiles() {
+            const q = $('fileSearch').value.trim().toLowerCase();
+            const box = $('filesContainer'); box.innerHTML = '';
+            const list = files.filter(f => !q || f.filename.toLowerCase().includes(q));
+            if (!list.length) { box.innerHTML = '<p class="text-sm text-gray-500">No files.</p>'; return; }
+            list.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'file-card' + (activeFile?.id === f.id ? ' active' : '');
+                card.innerHTML = `<div class="font-semibold text-indigo-900 truncate" title="${esc(f.filename)}">📄 ${esc(f.filename)}</div>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        <span class="badge bg-indigo-100 text-indigo-800">${esc((f.filetype || '').toUpperCase())}</span>
+                        ${f.parsed ? '<span class="badge bg-green-100 text-green-800">parsed</span>' : '<span class="badge bg-gray-200 text-gray-700">not parsed</span>'}
+                        ${f.public ? '<span class="badge bg-emerald-100 text-emerald-800">public</span>' : ''}
+                    </div>
+                    ${f.parsed ? '' : '<button class="btn btn-ghost mt-2 w-full" data-parse>Parse now</button>'}`;
+                card.addEventListener('click', (e) => { if (!e.target.closest('[data-parse]')) selectFile(f); });
+                card.querySelector('[data-parse]')?.addEventListener('click', async (e) => {
+                    e.target.disabled = true; e.target.textContent = 'Parsing…';
+                    try { const r = await api(`/files/${f.id}/parse`, { method: 'POST' }); f.parsed = true; toast(`Parsed ${r.triples_count} triples`, 'success'); renderFiles(); selectFile(f); }
+                    catch (err) { toast(err.message, 'error'); e.target.disabled = false; e.target.textContent = 'Parse now'; }
+                });
+                box.appendChild(card);
             });
         }
+        $('fileSearch').addEventListener('input', renderFiles);
 
-        function renderPage(page) {
-            const container = document.getElementById('filesContainer');
-            container.innerHTML = '';
-            const start = (page - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedItems = filesData.slice(start, end);
-            paginatedItems.forEach(file => container.appendChild(createCard(file)));
-            document.getElementById('pageInfo').textContent = `Page ${page} of ${Math.max(1, Math.ceil(filesData.length / itemsPerPage))}`;
-            document.getElementById('prevPage').disabled = page === 1;
-            document.getElementById('nextPage').disabled = end >= filesData.length;
-        }
-
-        document.getElementById('prevPage').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage(currentPage); } });
-        document.getElementById('nextPage').addEventListener('click', () => { if (currentPage < Math.ceil(filesData.length / itemsPerPage)) { currentPage++; renderPage(currentPage); } });
-
-        async function loadUserFiles() {
-            const token = localStorage.getItem('token');
+        async function selectFile(f) {
+            if (!f.parsed) { toast('Parse the file first', 'info'); return; }
+            activeFile = f; renderFiles();
+            history.replaceState(null, '', `?file=${f.id}`);
+            $('rootSelect').innerHTML = '<option value="">Start from top concepts</option>';
             try {
-                const response = await fetch(`${window.apiBaseUrl}/my-files/`, { headers: { 'Authorization': 'Bearer ' + token } });
-                if (!response.ok) throw new Error('Failed to fetch files');
-                filesData = await response.json();
-                currentPage = 1;
-                renderPage(currentPage);
-            } catch (err) { console.error(err); alert('Error loading files: ' + (err.message || err)); }
+                const { labels } = await api(`/files/${f.id}/skos`);
+                labels.slice(0, 2000).forEach(c => { const o = document.createElement('option'); o.value = c.subject; o.textContent = c.label; $('rootSelect').appendChild(o); });
+                $('rootSelect').disabled = false;
+            } catch (_) { }
+            ['reload', 'fit', 'download', 'nodeSearch'].forEach(id => $(id).disabled = false);
+            drawGraph();
         }
 
-        // --- Conversion ---
-        async function convertOnly(fileId) {
-            const token = localStorage.getItem('token');
-            const btn = document.getElementById(`convert-btn-${fileId}`);
-            setLoading(btn, true);
-            try {
-                const res = await fetch(`${window.apiBaseUrl}/files/${fileId}/convert`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
-                if (!res.ok) { const err = await safeJson(res); alert('Conversion failed: ' + (err.detail || err.message || res.statusText)); return false; }
-                const data = await res.json();
-                showNotification('Conversion succeeded!', 'success');
-                markParsed(fileId);
-                return true;
-            } catch (e) { console.error(e); alert('Conversion error: ' + e.message); return false; }
-            finally { setLoading(btn, false); }
-        }
+        // ---------- graph ----------
+        let sim = null, svg = null, gRoot = null, zoom = null, nodeSel = null, linkSel = null, graphData = null;
 
-        function setLoading(btn, isLoading) {
-            if (!btn) return;
-            if (isLoading) { btn.classList.add('btn-loading'); btn.dataset.orig = btn.innerHTML; btn.innerHTML = '⏳...'; btn.disabled = true; }
-            else { btn.classList.remove('btn-loading'); if (btn.dataset.orig) btn.innerHTML = btn.dataset.orig; btn.disabled = false; }
-        }
-
-        function markParsed(fileId) { const f = filesData.find(x => x.id === fileId); if (f) { f.parsed = true; renderPage(currentPage); } }
-
-        async function safeJson(resp) { try { return await resp.json(); } catch (e) { return { message: resp.statusText || 'Unknown error' }; } }
-
-        // --- View Graph ---
-        async function viewGraph(fileId) {
-            const token = localStorage.getItem('token');
-            const container = document.getElementById('graphContainer');
-            container.innerHTML = '<div class="p-4 text-gray-600">Loading graph...</div>';
-
-            try {
-                const res = await fetch(`${window.apiBaseUrl}/files/${fileId}/graph`, { headers: { 'Authorization': 'Bearer ' + token } });
-                if (!res.ok) { const err = await safeJson(res); container.innerHTML = `<div class="p-4 text-red-600">Failed to load graph: ${escapeHtml(err.detail || err.message)}</div>`; return; }
-                const data = await res.json();
-                if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.links)) { container.innerHTML = `<div class="p-4 text-red-600">Server returned invalid graph data.</div>`; return; }
-                renderD3Graph(data, container, fileId);
-            } catch (e) { console.error(e); container.innerHTML = `<div class="p-4 text-red-600">Error fetching graph: ${escapeHtml(e.message)}</div>`; }
-        }
-
-        // --- D3 rendering ---
-        function renderD3Graph(data, containerElement, fileId) {
-            const container = typeof containerElement === 'string' ? document.querySelector(containerElement) : containerElement;
-            container.innerHTML = '';
-            const width = container.clientWidth || 960;
-            const height = container.clientHeight || 600;
-
-            const svg = d3.select(container).append("svg").attr("width", width).attr("height", height).style("background", "transparent");
-            const g = svg.append("g");
-            svg.call(d3.zoom().scaleExtent([0.1, 4]).on("zoom", (event) => g.attr("transform", event.transform)));
-
-            const nodes = data.nodes.map(d => Object.assign({}, d));
-            const links = data.links.map(d => ({ source: d.source, target: d.target, relation: d.relation }));
-
-            const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(450))
-                .force("charge", d3.forceManyBody().strength(-400))
-                .force("center", d3.forceCenter(width / 2, height / 2))
-                .alphaTarget(0.1);
-
-            const link = g.append("g").attr("stroke-opacity", 0.8).selectAll("line").data(links).join("line").attr("stroke", "#999").attr("stroke-width", 1.5);
-
-            const linkLabel = g.append("g").selectAll("text").data(links).join("text").attr("font-size", 10).attr("fill", "#4b5563").text(d => shortName(d.relation));
-
-            const node = g.append("g")
-                .selectAll("circle")
-                .data(nodes)
-                .join("circle")
-                .attr("r", 10)
-                .attr("fill", "#4f46e5")
-                .call(drag(simulation))
-                .on("click", function (event, d) {
-                    showNodeInfo(d, fileId); // εδώ το d.id πρέπει να είναι το URI
-                });
-
-            const label = g.append("g").selectAll("text").data(nodes).join("text")
-                .text(d => d.name || d.id)
-                .attr("font-size", "12px")
-                .attr("fill", "#111827")
-                .attr("dx", 12)
-                .attr("dy", 4)
-                .style("pointer-events", "none");
-
-            simulation.on("tick", () => {
-                link.attr("x1", d => getNodeX(d.source)).attr("y1", d => getNodeY(d.source))
-                    .attr("x2", d => getNodeX(d.target)).attr("y2", d => getNodeY(d.target));
-                node.attr("cx", d => d.x).attr("cy", d => d.y);
-                label.attr("x", d => d.x).attr("y", d => d.y);
-                linkLabel.attr("x", d => (getNodeX(d.source) + getNodeX(d.target)) / 2)
-                    .attr("y", d => (getNodeY(d.source) + getNodeY(d.target)) / 2);
+        async function drawGraph(rootOverride) {
+            if (!activeFile) return;
+            const container = $('graphContainer');
+            container.innerHTML = '<div class="h-full flex items-center justify-center text-gray-500 text-sm">Loading graph…</div>';
+            $('nodeInfo').classList.add('hidden');
+            const params = new URLSearchParams({
+                depth: $('depth').value || 2, max_nodes: $('maxNodes').value || 300, include_related: $('related').checked,
             });
-
-            function getNodeX(n) { return (typeof n === 'object') ? n.x : (nodes.find(a => a.id === n) || {}).x || 0; }
-            function getNodeY(n) { return (typeof n === 'object') ? n.y : (nodes.find(a => a.id === n) || {}).y || 0; }
-
-            function drag(simulation) {
-                function dragstarted(event, d) { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
-                function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
-                function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
-                return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
-            }
+            const root = rootOverride ?? $('rootSelect').value;
+            if (root) params.set('root', root);
+            try {
+                graphData = await api(`/files/${activeFile.id}/graph?${params}`);
+                if (!graphData.nodes.length) { container.innerHTML = '<div class="h-full flex items-center justify-center text-gray-500 text-sm p-6 text-center">No concepts with labels found in this file.</div>'; return; }
+                render(graphData);
+                $('graphMeta').textContent = `${graphData.shown} of ${graphData.total_concepts} concepts` + (graphData.truncated ? ' · some children hidden — double-click a node with a + to expand, or raise depth / max nodes' : '');
+                $('graphMeta').classList.remove('hidden'); $('legend').classList.remove('hidden');
+            } catch (err) { container.innerHTML = `<div class="h-full flex items-center justify-center text-red-600 text-sm p-6 text-center">${esc(err.message)}</div>`; }
         }
 
-        // --- Node info panel ---
-        function showNodeInfo(node, fileId) {
-            const infoDiv = document.getElementById("nodeInfo");
-            infoDiv.style.display = "block";
-            infoDiv.innerHTML = `<p class="text-sm text-gray-500">Loading...</p>`;
+        function render(data) {
+            const container = $('graphContainer');
+            container.innerHTML = '';
+            const width = container.clientWidth, height = container.clientHeight;
+            const nodes = data.nodes.map(d => ({ ...d }));
+            const links = data.links.map(d => ({ ...d }));
+            const color = d3.scaleOrdinal(d3.schemeTableau10);
+            const radius = (d) => 6 + Math.min(14, Math.sqrt(d.children || 0) * 3);
 
-            fetch(`${window.apiBaseUrl}/nodes/${fileId}/${encodeURIComponent(node.id)}`)
-                .then(res => {
-                    if (!res.ok) throw new Error('Node not found');
-                    return res.json();
-                })
-                .then(nodeData => {
-                    let detailsHtml = '';
-                    if (nodeData.details && Object.keys(nodeData.details).length > 0) {
-                        detailsHtml = '<ul class="text-sm text-gray-700">';
-                        for (const [key, value] of Object.entries(nodeData.details)) {
-                            detailsHtml += `<li><strong>${shortName(key)}:</strong> ${value}</li>`;
-                        }
-                        detailsHtml += '</ul>';
-                    } else {
-                        detailsHtml = '<p class="text-sm text-gray-700">No additional info</p>';
-                    }
+            svg = d3.select(container).append('svg').attr('width', width).attr('height', height).attr('viewBox', [0, 0, width, height]);
+            gRoot = svg.append('g');
+            zoom = d3.zoom().scaleExtent([0.1, 6]).on('zoom', (e) => gRoot.attr('transform', e.transform));
+            svg.call(zoom).on('dblclick.zoom', null);
 
-                    infoDiv.innerHTML = `
-        <h4 class="font-bold text-indigo-900 mb-2">${nodeData.name}</h4>
-        ${detailsHtml}
-      `;
-                })
-                .catch(err => {
-                    infoDiv.innerHTML = `<p class="text-sm text-red-500">Error: ${err.message}</p>`;
-                });
+            sim = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.relation === 'broader' ? 70 : 120).strength(d => d.relation === 'broader' ? 0.8 : 0.2))
+                .force('charge', d3.forceManyBody().strength(-220))
+                .force('collide', d3.forceCollide().radius(d => radius(d) + 14))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            linkSel = gRoot.append('g').selectAll('line').data(links).join('line').attr('class', d => `link ${d.relation}`).attr('stroke-width', d => d.relation === 'broader' ? 1.5 : 1);
+
+            nodeSel = gRoot.append('g').selectAll('g').data(nodes).join('g').attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+                    .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+                    .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+            nodeSel.append('circle').attr('r', radius).attr('fill', d => color(d.depth));
+            nodeSel.append('text').attr('dx', d => radius(d) + 4).attr('dy', 4).attr('font-size', 11).attr('fill', '#111827')
+                .text(d => d.name.length > 32 ? d.name.slice(0, 30) + '…' : d.name);
+            nodeSel.filter(d => d.hidden_children > 0).append('text').attr('text-anchor', 'middle').attr('dy', 4).attr('font-size', 11).attr('font-weight', 700).attr('fill', '#fff').text('+');
+            nodeSel.append('title').text(d => `${d.name}\n${d.id}${d.hidden_children ? `\n${d.hidden_children} hidden children (double-click)` : ''}`);
+
+            nodeSel.on('click', (e, d) => { e.stopPropagation(); highlight(d); showNodeInfo(d); });
+            nodeSel.on('dblclick', (e, d) => { e.stopPropagation(); if (d.hidden_children || d.children) { $('rootSelect').value = d.id; drawGraph(d.id); } });
+            svg.on('click', () => { highlight(null); $('nodeInfo').classList.add('hidden'); });
+
+            sim.on('tick', () => {
+                linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+            sim.on('end', fit);
         }
 
-        // shortName helper
-        function shortName(uri) {
-            if (!uri) return '';
-            if (uri.includes('#')) return uri.split('#').pop();
-            const parts = uri.split('/');
-            return parts[parts.length - 1];
+        function highlight(d) {
+            if (!nodeSel) return;
+            if (!d) { nodeSel.classed('dim', false); linkSel.classed('dim', false); return; }
+            const near = new Set([d.id]);
+            linkSel.each(l => { if (l.source.id === d.id) near.add(l.target.id); if (l.target.id === d.id) near.add(l.source.id); });
+            nodeSel.classed('dim', n => !near.has(n.id));
+            linkSel.classed('dim', l => l.source.id !== d.id && l.target.id !== d.id);
         }
 
+        function fit() {
+            if (!gRoot || !svg) return;
+            const b = gRoot.node().getBBox(); if (!b.width || !b.height) return;
+            const w = svg.attr('width'), h = svg.attr('height');
+            const scale = Math.min(0.9 * w / b.width, 0.9 * h / b.height, 2);
+            const t = d3.zoomIdentity.translate(w / 2 - scale * (b.x + b.width / 2), h / 2 - scale * (b.y + b.height / 2)).scale(scale);
+            svg.transition().duration(500).call(zoom.transform, t);
+        }
+        $('fit').addEventListener('click', fit);
+        $('reload').addEventListener('click', () => drawGraph());
+        $('rootSelect').addEventListener('change', () => drawGraph());
+        $('download').addEventListener('click', () => {
+            if (!svg) return;
+            const s = new XMLSerializer().serializeToString(svg.node());
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
+            a.download = `${activeFile.filename}_graph.svg`; a.click();
+        });
+        $('nodeSearch').addEventListener('input', (e) => {
+            const q = e.target.value.trim().toLowerCase();
+            if (!nodeSel) return;
+            nodeSel.classed('hit', d => q && d.name.toLowerCase().includes(q));
+            if (q) { const hit = nodeSel.filter(d => d.name.toLowerCase().includes(q)).data()[0]; if (hit && hit.x != null) svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(svg.attr('width') / 2 - hit.x * 1.5, svg.attr('height') / 2 - hit.y * 1.5).scale(1.5)); }
+        });
+        window.addEventListener('resize', () => { if (graphData) render(graphData); });
 
-
-        function shortName(uri) {
-            if (!uri) return '';
-            if (uri.includes('#')) return uri.split('#').pop();
-            const parts = uri.split('/');
-            return parts[parts.length - 1];
+        // ---------- node info ----------
+        async function showNodeInfo(d) {
+            const box = $('nodeInfo');
+            box.classList.remove('hidden');
+            box.innerHTML = `<h4 class="font-bold text-indigo-900 mb-1">${esc(d.name)}</h4><p class="text-xs text-gray-400 break-all mb-2">${esc(d.id)}</p><p class="text-sm text-gray-500">Loading…</p>`;
+            try {
+                const data = await api(`/node-details-skostree/?file_id=${activeFile.id}&uri=${encodeURIComponent(d.id)}`);
+                const rows = Object.entries(data.details).map(([k, v]) => {
+                    const vals = (Array.isArray(v) ? v : [v]).map(x => String(x).startsWith('http') ? `<a href="#" data-goto="${esc(x)}" class="text-indigo-600 underline">${esc(shortName(x))}</a>` : esc(x));
+                    return `<li><span class="font-semibold text-gray-700">${esc(k)}:</span> ${vals.join(', ')}</li>`;
+                }).join('');
+                box.innerHTML = `<div class="flex justify-between items-start gap-2"><h4 class="font-bold text-indigo-900">${esc(d.name)}</h4><button class="text-gray-400 hover:text-gray-700" data-close>✕</button></div>
+                    <p class="text-xs text-gray-400 break-all mb-2">${esc(d.id)}</p>
+                    <ul class="text-sm space-y-1">${rows || '<li class="text-gray-500">No properties</li>'}</ul>
+                    <div class="flex gap-2 mt-3">
+                        <button class="btn btn-primary flex-1" data-focus>Focus here</button>
+                        <a class="btn btn-ghost" href="./skosviewer/${activeFile.id}" target="_blank">Open in viewer</a>
+                    </div>`;
+                box.querySelector('[data-close]').addEventListener('click', () => { box.classList.add('hidden'); highlight(null); });
+                box.querySelector('[data-focus]').addEventListener('click', () => { $('rootSelect').value = d.id; drawGraph(d.id); });
+                box.querySelectorAll('[data-goto]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); const uri = a.dataset.goto; const n = nodeSel?.data().find(x => x.id === uri); if (n) { highlight(n); showNodeInfo(n); } else { $('rootSelect').value = uri; drawGraph(uri); } }));
+            } catch (err) { box.innerHTML += `<p class="text-sm text-red-600">${esc(err.message)}</p>`; }
         }
 
-        loadUserFiles();
-
-        function showNotification(message, type = 'success') {
-            const panel = document.getElementById('notificationPanel');
-            panel.textContent = message;
-
-            panel.className = "fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center z-50";
-
-            if (type === 'success') {
-                panel.classList.add("bg-green-500");
-            } else if (type === 'error') {
-                panel.classList.add("bg-red-500");
-            } else if (type === 'warning') {
-                panel.classList.add("bg-yellow-500");
-            } else {
-                panel.classList.add("bg-gray-700");
-            }
-
-            panel.classList.remove("hidden");
-
-            setTimeout(() => {
-                panel.classList.add("hidden");
-            }, 5000);
-        }
+        loadFiles();
     </script>
-    
-    <div 
-        id="notificationPanel" 
-        class="fixed top-6 left-1/2 transform -translate-x-1/2 w-auto max-w-lg px-6 py-3 rounded-xl shadow-lg text-white font-medium text-center hidden z-50">
-    </div>
-    
-    <footer class="mt-12 text-indigo-100 text-sm text-center">
-        &copy; 2025 AlignMe. All rights reserved.
-    </footer>
 </body>
 
 </html>

@@ -1,0 +1,45 @@
+[x-cloak] {
+    display: none !important;
+}
+
+details > summary {
+    list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+    display: none;
+}
+
+details > summary::before {
+    content: "▸";
+    display: inline-block;
+    width: 1rem;
+    color: #6366f1;
+    transition: transform 0.15s;
+}
+
+details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+details.leaf > summary::before {
+    content: "•";
+    color: #c7d2fe;
+}
+
+.lang {
+    font-size: 0.65rem;
+    padding: 0 0.35rem;
+    border-radius: 4px;
+    background: #e0e7ff;
+    color: #3730a3;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}

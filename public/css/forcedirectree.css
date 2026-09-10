@@ -1,0 +1,166 @@
+.panel {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #6366f1, #9333ea);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.08);
+}
+
+.btn-ghost {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-ghost:hover {
+    background: #e5e7eb;
+}
+
+.input {
+    padding: 0.45rem 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    background: #fff;
+}
+
+.input:focus {
+    outline: 2px solid #6366f1;
+    border-color: transparent;
+}
+
+.file-card {
+    border-radius: 14px;
+    border: 2px solid transparent;
+    background: #fff;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    transition:
+        border-color 0.15s,
+        transform 0.15s;
+}
+
+.file-card:hover {
+    transform: translateY(-2px);
+}
+
+.file-card.active {
+    border-color: #9333ea;
+    background: #faf5ff;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+svg text {
+    pointer-events: none;
+    user-select: none;
+}
+
+.node circle {
+    cursor: pointer;
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.node.dim {
+    opacity: 0.15;
+}
+
+.link.dim {
+    opacity: 0.05;
+}
+
+.node.hit circle {
+    stroke: #facc15;
+    stroke-width: 4px;
+}
+
+.link {
+    stroke-opacity: 0.6;
+}
+
+.link.broader {
+    stroke: #9ca3af;
+}
+
+.link.related {
+    stroke: #f59e0b;
+    stroke-dasharray: 4 3;
+}
+
+.link.exactMatch,
+.link.closeMatch,
+.link.broadMatch,
+.link.narrowMatch,
+.link.relatedMatch {
+    stroke: #10b981;
+    stroke-dasharray: 2 3;
+}
+
+.toast {
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.875rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 0.25s,
+        transform 0.25s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: none;
+}
+
+.toast-success {
+    background: #059669;
+}
+
+.toast-error {
+    background: #dc2626;
+}
+
+.toast-info {
+    background: #4338ca;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}
