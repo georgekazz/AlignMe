@@ -203,13 +203,13 @@
         if (!token) window.location.href = "/login";
 
         const state = {
-            files: [null, null],          
-            selected: null,               
-            suggestion: null,            
-            swapped: false,              
+            files: [null, null],
+            selected: null,
+            suggestion: null,
+            swapped: false,
             linkTypes: [],
         };
-        const trees = {};                 
+        const trees = {};
 
         async function api(path, options = {}) {
             const res = await fetch(window.apiBaseUrl + path, {
@@ -562,7 +562,12 @@
                     try {
                         const r = await api(`/projects/${projectId}/alignment/accept`, {
                             method: "POST",
-                            body: JSON.stringify({ method: params.get("method"), min_threshold: 0.9, relations: ["exactMatch"] })
+                            body: JSON.stringify({
+                                method: params.get("method"), min_threshold: 0.9, relations: ["exactMatch"],
+                                use_context: params.get("use_context") === "true",
+                                structural_threshold: Number(params.get("structural_threshold")),
+                                propagation_iterations: Number(params.get("propagation_iterations")),
+                            })
                         }).then(r => r.json());
                         toast(`Created ${r.created} links`, "success"); loadLinks();
                     } catch (err) { toast(err.message, "error"); e.target.disabled = false; }
